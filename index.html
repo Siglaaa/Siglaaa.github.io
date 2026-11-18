@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <script>
 window.NUTRI_MODE = 'web';
-window.NUTRI_VERSION = '2026-11-18-ed4cbf2e';
+window.NUTRI_VERSION = '2026-11-18-2a9ccbbd';
 if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -196,8 +196,9 @@ button { cursor: pointer; }
 .saisie-ligne textarea { flex: 1; min-width: 0; min-height: 42px; max-height: 120px; resize: none; padding: 9px 12px; border: 1px solid var(--trait-fort); border-radius: 8px; background: var(--surface); line-height: 1.35; }
 .saisie-outils { display: flex; gap: 16px; }
 
-.onglets { flex: none; display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--trait); background: var(--surface); }
-.onglet { min-height: 46px; padding: 6px 2px; border: 0; border-top: 3px solid transparent; background: none; font-size: 12.5px; font-weight: 600; font-stretch: 88%; color: var(--encre-3); }
+.onglets { flex: none; display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid var(--trait); background: var(--surface); }
+.onglet { min-height: 46px; padding: 6px 1px; border: 0; border-top: 3px solid transparent; background: none; font-size: 12.5px; font-weight: 600; font-stretch: 85%; color: var(--encre-3); }
+@media (max-width: 380px) { .onglet { font-size: 11.5px; font-stretch: 78%; } }
 .onglet.actif { color: var(--bleu); border-top-color: var(--bleu); }
 
 /* Tableaux, barres, jauges, graphique */
@@ -276,6 +277,12 @@ button { cursor: pointer; }
 .grille-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 10px; }
 .resultats { display: grid; margin-top: 4px; }
 .resultat { display: flex; justify-content: space-between; gap: 8px; padding: 9px 4px; border: 0; border-bottom: 1px solid var(--trait); background: none; text-align: left; }
+.aliments { display: grid; margin-top: 6px; border-top: 1px solid var(--encre); }
+.aliment { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; width: 100%; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--trait); background: none; color: inherit; text-align: left; cursor: pointer; }
+.aliment-nom { min-width: 0; font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.aliment-kcal { font-size: 17px; font-weight: 700; font-stretch: 75%; font-variant-numeric: tabular-nums; text-align: right; line-height: 1.1; }
+.aliment-unite { display: block; font-size: 11.5px; font-weight: 500; font-stretch: 100%; color: var(--encre-3); }
+.dialogue-corps .sous-titre { margin-top: 16px; font-size: 14px; font-weight: 700; color: var(--encre); }
 .resultat .chiffre { flex: none; font-size: 12.5px; color: var(--encre-3); font-variant-numeric: tabular-nums; }
 .selection { margin-top: 8px; padding: 8px 10px; background: var(--bleu-pale); border-radius: 8px; font-weight: 600; }
 .puces-portions { margin-top: 8px; }
@@ -517,6 +524,26 @@ button { cursor: pointer; }
     REF.list.forEach(function (a) { REF.byId[a.id] = a; a._n = norm(a.nom); a._s = norm(a.syn); });
   }
   function refPer100(a) { return { kcal: a.kcal, p: a.p, g: a.g, l: a.l, f: a.f }; }
+  // Table des aliments consultable : texte (nom et autres noms, accents ignorés), famille ou « recettes », puis tri.
+  function listRef(o) {
+    o = o || {};
+    var words = norm(o.q || '').split(' ').filter(Boolean), fam = o.famille || '';
+    var cle = { 'kcal-asc': ['kcal', 1], 'kcal-desc': ['kcal', -1], 'p-desc': ['p', -1], 'f-desc': ['f', -1] }[o.tri];
+    var parNom = function (a, b) { return a._n < b._n ? -1 : a._n > b._n ? 1 : 0; };
+    return REF.list.filter(function (a) {
+      if (fam === 'recettes' ? a.src !== 'RECETTE' : fam && (a.groupes || []).indexOf(fam) < 0) return false;
+      return words.every(function (w) { return a._n.indexOf(w) >= 0 || a._s.indexOf(w) >= 0; });
+    }).sort(function (a, b) { return (cle ? cle[1] * (a[cle[0]] - b[cle[0]]) : 0) || parNom(a, b); });
+  }
+  // Part de l'énergie apportée par chaque nutriment (4, 4, 9 et 2 kcal par gramme), en % entiers totalisant 100.
+  function energySplit(a) {
+    var e = { p: 4 * a.p, g: 4 * a.g, l: 9 * a.l, f: 2 * a.f }, t = e.p + e.g + e.l + e.f, out = {}, reste = 100;
+    if (!(t > 0)) return null;
+    var parts = ['p', 'g', 'l', 'f'].map(function (k) { var x = 100 * e[k] / t; out[k] = Math.floor(x + 1e-9); reste -= out[k]; return [k, x - out[k]]; });
+    parts.sort(function (x, y) { return y[1] - x[1]; });
+    for (var i = 0; i < reste; i++) out[parts[i][0]]++;
+    return out;
+  }
   function searchRef(q, limit) {
     var words = norm(q).split(' ').filter(Boolean);
     if (!words.length) return [];
@@ -1097,6 +1124,7 @@ button { cursor: pointer; }
       var steps = Number(m[1].replace(/[^\d]/g, ''));
       if (steps >= 0 && steps <= 100000) return { steps: steps, date: /hier/i.test(m[2] || '') ? addDays(today, -1) : today };
     }
+    if (/^(?:(?:affiche|montre|voir|ouvre)\s+)?(?:la\s+)?(?:table|liste)\s+des\s+aliments$|^aliments$/.test(n)) return { view: 'aliments' };
     if (/\d\s*(g|kg|ml|cl|l)\b/.test(n)) return null;
     if (!/^(affiche|montre|voir|ouvre|genere|donne|quel est|ou en est|mon|ma|mes|le|la|bilan|rapport|historique)\b/.test(n)) return null;
     if (/\b(ajoute|corrige|supprime|annule|enleve|retire|mange|bu|pris|pese)\b/.test(n)) return null;
@@ -1473,7 +1501,7 @@ button { cursor: pointer; }
     TENDANCE: TENDANCE, weightTrend: weightTrend, trendAt: trendAt, weightComparison: weightComparison,
     dayEnergy: dayEnergy, countsForBalance: countsForBalance,
     totals: totals, shares: shares, dayStatus: dayStatus, statusText: statusText, weekReport: weekReport,
-    findDuplicates: findDuplicates, sortEntries: sortEntries, splitFoodQty: splitFoodQty,
+    findDuplicates: findDuplicates, sortEntries: sortEntries, splitFoodQty: splitFoodQty, listRef: listRef, energySplit: energySplit,
     itemFromEntry: itemFromEntry, mealItems: mealItems, itemsTotal: itemsTotal, makeFavorite: makeFavorite, applyChoices: applyChoices, instantiate: instantiate,
     activeFavorites: activeFavorites, favoriteByName: favoriteByName, copySuggestions: copySuggestions,
     inferMeal: inferMeal, buildInstructions: buildInstructions, buildContext: buildContext, interpret: interpret, localCommand: localCommand, parseJsonLoose: parseJsonLoose,
@@ -1776,7 +1804,7 @@ button { cursor: pointer; }
     meta: { k: 'meta', schema: 1, createdAt: null, lastBackupAt: null, lastBackupLignes: 0, changes: 0, profile: null, favoris: [] },
     storeKind: 'attente', persist: null, usage: null, loss: null, ready: false,
     thread: [], turns: [], busy: false, ecrit: false, abort: null, caps: { done: false, sample: null, sansJson: false, downloads: null },
-    histRange: 'semaine', refQuery: '', selfTest: null, flash: {}, scrollEnd: false, install: null
+    histRange: 'semaine', refQuery: '', selfTest: null, flash: {}, scrollEnd: false, install: null, al: { q: '', famille: '', tri: 'nom' }
   };
   var INSTRUCTIONS = C.buildInstructions();
 
@@ -2350,7 +2378,7 @@ button { cursor: pointer; }
   }
   // o (facultatif) : { recherche, grammes } tirés de la zone de saisie dans la version web.
   function dialogueManuel(o) {
-    o = o && typeof o === 'object' && typeof o.recherche === 'string' ? o : {};
+    o = o && typeof o === 'object' && (typeof o.recherche === 'string' || o.aliment) ? o : {};
     var now = C.nowTunis(), choisi = null, autre = false, confirmeDoublon = false;
     var rech = h('input', { id: 'm-rech', type: 'search', placeholder: 'Par exemple : couscous, pain, œuf', autocomplete: 'off', value: o.recherche || '' });
     var liste = h('div', { class: 'resultats', role: 'listbox', 'aria-label': 'Aliments trouvés' });
@@ -2387,6 +2415,7 @@ button { cursor: pointer; }
     }
     rech.addEventListener('input', chercher);
     if (o.recherche) chercher();
+    if (o.aliment) { choisir(o.aliment); setTimeout(function () { try { q.focus(); } catch (e) { /* rien */ } }, 60); }
     var blocRef = h('div', null, champ('Aliment', rech), liste, selection, portions);
     var corps = h('div', null, blocRef, blocAutre, bascule,
       h('div', { class: 'grille-2' }, champ('Quantité (g)', q), champ('Repas', repas)),
@@ -3207,22 +3236,6 @@ button { cursor: pointer; }
       st ? h('ul', { class: 'controle', id: 'resultat-test' }, st.rows.map(function (r) { return h('li', { class: r.ok ? 'ok' : r.soft ? 'doux' : 'ko' }, h('span', { class: 'controle-marque', text: r.ok ? 'Oui' : r.soft ? 'À noter' : 'Non' }), h('span', null, h('strong', { text: r.label + '. ' }), r.detail)); })) : null,
       st && S.caps.sample ? h('div', { class: 'bloc-actions' }, h('button', { type: 'button', class: 'btn btn-petit', disabled: st.ia && st.ia.state === 'cours', onclick: testerClaude }, st.ia && st.ia.state === 'cours' ? 'Appel en cours…' : 'Tester un appel à Claude'),
         st.ia && st.ia.detail ? h('span', { class: 'note', text: st.ia.detail }) : null) : null]));
-    // Table de référence
-    var rq = h('input', { id: 'ref-rech', type: 'search', placeholder: 'Chercher un aliment', value: S.refQuery, autocomplete: 'off' });
-    var zone = h('div', { id: 'ref-liste' });
-    function remplir() {
-      clear(zone);
-      var res = S.refQuery ? C.searchRef(S.refQuery, 20) : C.REF.list.slice(0, 12);
-      if (!res.length) { zone.appendChild(h('p', { class: 'note', text: 'Aucun aliment trouvé dans la table.' })); return; }
-      zone.appendChild(tableau(['Aliment', 'kcal', 'Prot.', 'Gluc.', 'Lip.', 'Fibres'], res.map(function (a) { return { cells: [a.nom, C.fmtInt(a.kcal), C.fmt1(a.p), C.fmt1(a.g), C.fmt1(a.l), C.fmt1(a.f)] }; })));
-      if (!S.refQuery) zone.appendChild(h('p', { class: 'note', text: C.REF.list.length + ' aliments au total, pour 100 g. Cherchez un nom pour voir les autres.' }));
-    }
-    rq.addEventListener('input', function () { S.refQuery = rq.value; remplir(); });
-    remplir();
-    var nb = { CIQUAL: 0, USUEL: 0, RECETTE: 0, OFF: 0 };
-    C.REF.list.forEach(function (a) { nb[a.src] = (nb[a.src] || 0) + 1; });
-    out.push(section('Table de référence', [champ('Recherche', rq), zone,
-      h('p', { class: 'note', text: nb.CIQUAL + ' valeurs relues dans la table Ciqual 2013 ; ' + nb.USUEL + ' valeurs usuelles Ciqual et USDA, non relues une à une ; ' + nb.RECETTE + ' plats estimés par recette type, à forte incertitude.' })]));
     out.push(section('Méthode et limites', h('ul', { class: 'puces' },
       h('li', { text: 'Calories et macronutriments : valeur pour 100 g multipliée par les grammes. Glucides hors fibres.' }),
       h('li', { text: 'Métabolisme de base : formule de Mifflin-St Jeor (poids, taille, âge, sexe).' }),
@@ -3231,12 +3244,75 @@ button { cursor: pointer; }
       h('li', { text: 'Variation de poids théorique : bilan cumulé divisé par 7 700 kcal par kilogramme, sur les journées où les trois repas principaux sont saisis.' }),
       h('li', { text: 'Tendance du poids : moyenne lissée des pesées. À chaque pesée, la tendance se rapproche de la nouvelle valeur d\'une part égale à 1 − 0,9 puissance le nombre de jours écoulés depuis la pesée précédente (10 % après un jour, 52 % après une semaine).' }),
       h('li', { text: 'Repas repris ou favoris : les valeurs pour 100 g, la source et le marquage des quantités sont recopiés ; une quantité modifiée au moment de la reprise est enregistrée comme déclarée.' }),
+      h('li', { text: "Table des aliments : consultable dans l'onglet Aliments, avec la source et la fiabilité de chaque valeur." }),
       h('li', { text: "Tout est estimé. L'application ne fixe aucun objectif et ne remplace pas l'avis d'un professionnel de santé." }))));
     return out;
   }
 
+  // ------------------------------------------------------- table des aliments
+  var TRIS_AL = [['nom', 'Nom'], ['kcal-asc', 'Moins calorique'], ['kcal-desc', 'Plus calorique'], ['p-desc', 'Plus de protéines'], ['f-desc', 'Plus de fibres']];
+  var INC_TEXTE = {
+    faible: "Incertitude faible : la valeur varie peu d'un produit à l'autre.",
+    moyenne: 'Incertitude moyenne : la composition varie selon le produit ou la préparation.',
+    'élevée': 'Incertitude élevée : la recette varie beaucoup, la valeur est un ordre de grandeur.'
+  };
+  function ligneAliment(a) {
+    var sous = (a.src === 'RECETTE' ? 'Recette type. ' : '') + 'Prot. ' + C.fmt1(a.p) + ' g, gluc. ' + C.fmt1(a.g) + ' g, lip. ' + C.fmt1(a.l) + ' g, fibres ' + C.fmt1(a.f) + ' g';
+    return h('button', { type: 'button', class: 'aliment', 'data-id': a.id, onclick: function () { dialogueAliment(a); } },
+      h('span', { class: 'aliment-nom' }, a.nom, h('span', { class: 'l-sous', text: sous })),
+      h('span', { class: 'aliment-kcal' }, C.fmtInt(a.kcal), h('span', { class: 'aliment-unite', text: 'kcal' })));
+  }
+  function dialogueAliment(a) {
+    var per = C.refPer100(a), sp = C.energySplit(a), por = a.portions || [];
+    var fams = (a.groupes || []).map(function (k) { return C.REF.groupes[k]; }).filter(Boolean);
+    var src = (C.REF.doc && C.REF.doc.sources && C.REF.doc.sources[a.src]) || a.src;
+    var corps = h('div', null,
+      h('p', { class: 'dl-meta', text: (fams.length ? fams.join(', ') : 'Sans famille') + (a.src === 'RECETTE' ? '. Plat estimé à partir d\'une recette type.' : '.') }),
+      h('h3', { class: 'sous-titre', text: 'Valeurs pour 100 g' }),
+      tableau(['Nutriment', 'Pour 100 g'], [
+        { cells: ['Énergie (kcal)', C.fmtInt(a.kcal)] }, { cells: ['Protéines (g)', C.fmt1(a.p)] }, { cells: ['Glucides hors fibres (g)', C.fmt1(a.g)] },
+        { cells: ['Lipides (g)', C.fmt1(a.l)] }, { cells: ['Fibres (g)', C.fmt1(a.f)] }], 'etroit'),
+      sp ? h('p', { class: 'note', id: 'al-energie', text: "Part de l'énergie : protéines " + sp.p + ' %, glucides ' + sp.g + ' %, lipides ' + sp.l + ' %, fibres ' + sp.f + ' % (4, 4, 9 et 2 kcal par gramme).' }) : null,
+      por.length ? h('h3', { class: 'sous-titre', text: 'Portions usuelles' }) : null,
+      por.length ? tableau(['Portion', 'Poids (g)', 'kcal'], por.map(function (p) { return { cells: [p.u, C.fmt1(p.g), C.fmtInt(C.computeValues(per, p.g).kcal)] }; }), 'etroit') : null,
+      por.length ? h('p', { class: 'note', text: 'Poids usuels estimés ; calories calculées à partir des valeurs pour 100 g.' }) : null,
+      h('h3', { class: 'sous-titre', text: 'Source et fiabilité' }),
+      h('p', { id: 'al-source', text: src + '.' }),
+      h('p', { text: INC_TEXTE[a.inc] || '' }),
+      a.note ? h('p', { class: 'note', text: 'Hypothèse : ' + a.note }) : null,
+      a.syn ? h('p', { class: 'note', text: 'Autres noms reconnus : ' + a.syn + '.' }) : null);
+    dialogue({ titre: a.nom, corps: corps, focusTitre: true, actions: [{ label: 'Fermer' }, { label: 'Ajouter au journal', kind: 'principal', onClick: function () { dialogueManuel({ aliment: a }); } }] });
+  }
+  function vueAliments() {
+    var fams = [['', 'Toutes'], ['recettes', 'Plats et recettes types']].concat(Object.keys(C.REF.groupes).map(function (k) { return [k, C.REF.groupes[k]]; }));
+    var rq = h('input', { id: 'al-rech', type: 'search', placeholder: 'Par exemple : pain, khobz, kafteji', value: S.al.q, autocomplete: 'off' });
+    var fam = h('select', { id: 'al-famille' }, fams.map(function (f) { return h('option', { value: f[0], selected: S.al.famille === f[0] }, f[1]); }));
+    var tri = h('select', { id: 'al-tri' }, TRIS_AL.map(function (t) { return h('option', { value: t[0], selected: S.al.tri === t[0] }, t[1]); }));
+    var compte = h('p', { class: 'note', id: 'al-compte', 'aria-live': 'polite' }), liste = h('div', { class: 'aliments', id: 'al-liste' });
+    function remplir() {
+      var res = C.listRef({ q: S.al.q, famille: S.al.famille, tri: S.al.tri });
+      compte.textContent = res.length + ' aliment' + (res.length > 1 ? 's' : '') + ' sur ' + C.REF.list.length + '. Calories pour 100 g ; touchez un aliment pour le détail.';
+      clear(liste);
+      if (!res.length) liste.appendChild(h('p', { class: 'vide', text: 'Aucun aliment ne correspond. Essayez un autre mot ou une autre famille.' }));
+      res.forEach(function (a) { liste.appendChild(ligneAliment(a)); });
+    }
+    rq.addEventListener('input', function () { S.al.q = rq.value; remplir(); });
+    fam.addEventListener('change', function () { S.al.famille = fam.value; remplir(); });
+    tri.addEventListener('change', function () { S.al.tri = tri.value; remplir(); });
+    remplir();
+    var nb = { CIQUAL: 0, USUEL: 0, RECETTE: 0 }, conv = (C.REF.doc && C.REF.doc.convention) || '';
+    C.REF.list.forEach(function (a) { nb[a.src] = (nb[a.src] || 0) + 1; });
+    return [
+      section(null, [champ('Rechercher', rq), h('div', { class: 'grille-2' }, champ('Famille', fam), champ('Trier par', tri)), compte, liste]),
+      section('À propos de ces valeurs', h('ul', { class: 'puces' },
+        conv ? h('li', { text: conv.replace(/ x /g, ' × ') }) : null,
+        h('li', { text: nb.CIQUAL + ' valeurs relues dans la table Ciqual 2013 (ANSES) ; ' + nb.USUEL + ' valeurs usuelles des tables Ciqual et USDA, non relues une à une ; ' + nb.RECETTE + ' plats estimés à partir d\'une recette type, à lire comme des ordres de grandeur.' }),
+        h('li', { text: "Un aliment absent de la table se saisit avec vos propres valeurs : Saisie manuelle, puis « L'aliment n'est pas dans la table »." + (WEB ? '' : ' Vous pouvez aussi le décrire dans la zone de saisie : Claude estimera ses valeurs.') })))
+    ];
+  }
+
   // ---------------------------------------------------------- rendu global
-  var VUES = { journal: ['Journal', vueJournal], bilan: ['Bilan', vueBilan], semaine: ['Semaine', vueSemaine], historique: ['Historique', vueHistorique], donnees: ['Données', vueDonnees] };
+  var VUES = { journal: ['Journal', vueJournal], bilan: ['Bilan', vueBilan], semaine: ['Semaine', vueSemaine], historique: ['Historique', vueHistorique], aliments: ['Aliments', vueAliments], donnees: ['Données', vueDonnees] };
   function go(view) {
     if (!VUES[view]) return;
     S.view = view;
@@ -3262,8 +3338,8 @@ button { cursor: pointer; }
         h('div', { class: 'nav-titre' }, h('h1', { text: S.week === C.weekStart(S.today) ? 'Cette semaine' : 'Semaine ' + iw.week }), h('p', { text: cap(C.frWeek(S.week)) })),
         navBtn('Semaine suivante', '›', S.week >= C.weekStart(S.today), function () { S.week = C.addDays(S.week, 7); render(); })));
     } else {
-      e.appendChild(h('div', { class: 'nav seul' }, h('div', { class: 'nav-titre' }, h('h1', { text: S.view === 'historique' ? 'Historique' : 'Données et réglages' }),
-        h('p', { text: S.view === 'historique' ? 'Journées saisies, de la plus récente à la plus ancienne' : 'Profil, fichiers, vérifications' }))));
+      var tt = { historique: ['Historique', 'Journées saisies, de la plus récente à la plus ancienne'], aliments: ['Aliments', 'Table de référence : ' + C.REF.list.length + ' aliments, valeurs pour 100 g'], donnees: ['Données et réglages', 'Profil, fichiers, vérifications'] }[S.view] || ['', ''];
+      e.appendChild(h('div', { class: 'nav seul' }, h('div', { class: 'nav-titre' }, h('h1', { text: tt[0] }), h('p', { text: tt[1] }))));
     }
   }
   function renderOnglets() {
