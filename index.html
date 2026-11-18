@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <script>
 window.NUTRI_MODE = 'web';
-window.NUTRI_VERSION = '2026-11-18-2a9ccbbd';
+window.NUTRI_VERSION = '2026-11-18-7ec7e7ef';
 if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -283,6 +283,9 @@ button { cursor: pointer; }
 .aliment-kcal { font-size: 17px; font-weight: 700; font-stretch: 75%; font-variant-numeric: tabular-nums; text-align: right; line-height: 1.1; }
 .aliment-unite { display: block; font-size: 11.5px; font-weight: 500; font-stretch: 100%; color: var(--encre-3); }
 .dialogue-corps .sous-titre { margin-top: 16px; font-size: 14px; font-weight: 700; color: var(--encre); }
+/* Annotation en marge du registre : lignes enregistrées avec d'autres valeurs que celles de l'aliment. */
+.aligner { margin-top: 12px; padding: 8px 10px; border-left: 4px solid var(--bleu); background: var(--bleu-pale); font-size: 13.5px; }
+.aligner .puces { margin: 6px 0 8px; }
 .resultat .chiffre { flex: none; font-size: 12.5px; color: var(--encre-3); font-variant-numeric: tabular-nums; }
 .selection { margin-top: 8px; padding: 8px 10px; background: var(--bleu-pale); border-radius: 8px; font-weight: 600; }
 .puces-portions { margin-top: 8px; }
@@ -358,7 +361,7 @@ button { cursor: pointer; }
 <div id="dialogues"></div>
 <div class="bulle" id="bulle" role="tooltip" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<script>window.NUTRI_REF = {"version":"2026-11-15","convention":"Valeurs pour 100 g de partie comestible, aliment tel que consommé. Glucides hors fibres. Énergie non relue calculée ainsi : 4 x protéines + 4 x glucides + 9 x lipides + 2 x fibres.","sources":{"CIQUAL":"Table Ciqual 2013 (ANSES), valeur relue lors de la mise en place","OFF":"Open Food Facts (étiquette d'un produit)","USUEL":"Valeur usuelle des tables Ciqual et USDA, non relue individuellement","RECETTE":"Estimation calculée à partir d'une recette type"},"groupes":{"cereales":"Céréales et féculents","legumes":"Légumes","fruits":"Fruits","legumineuses":"Légumineuses","vpo":"Viandes, poissons, œufs","laitiers":"Produits laitiers","gras":"Matières grasses","sucres":"Produits sucrés","noix":"Fruits à coque et graines","boissons":"Boissons"},"aliments":[{"id":"pain_baguette","nom":"Pain baguette (pain blanc)","syn":"baguette, pain blanc, pain, khobz","kcal":286,"p":9.33,"g":56.6,"l":1.47,"f":3.02,"portions":[{"u":"1 baguette tunisienne","g":220},{"u":"1 demi-baguette","g":110},{"u":"1 quart de baguette","g":55},{"u":"1 morceau","g":50},{"u":"1 tranche","g":25}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"pain_complet","nom":"Pain complet","syn":"pain intégral, pain de son, khobz kamel","kcal":269,"p":9.04,"g":50.6,"l":1.75,"f":5.6,"portions":[{"u":"1 tranche","g":35},{"u":"1 morceau","g":50}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"pain_de_mie","nom":"Pain de mie","syn":"pain toast, toast","kcal":281,"p":8.2,"g":49.2,"l":4.7,"f":2.96,"portions":[{"u":"1 tranche","g":28}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"pain_tabouna","nom":"Pain tabouna","syn":"tabouna, khobz tabouna, pain maison","kcal":270,"p":9.0,"g":54.0,"l":1.3,"f":3.2,"portions":[{"u":"1 pain entier","g":250},{"u":"1 quart","g":60},{"u":"1 morceau","g":60}],"groupes":["cereales"],"src":"RECETTE","inc":"moyenne","note":"Pain de semoule cuit au four traditionnel ; valeur estimée par analogie avec le pain courant."},{"id":"kesra","nom":"Kesra (galette de semoule)","syn":"khobz kesra, galette, kessra","kcal":325,"p":9.3,"g":53.0,"l":7.8,"f":2.7,"portions":[{"u":"1 galette entière","g":300},{"u":"1 quart de galette","g":75},{"u":"1 morceau","g":60}],"groupes":["cereales"],"src":"RECETTE","inc":"élevée","note":"Très variable selon la quantité d'huile (de 270 à 350 kcal/100 g relevés sur des produits)."},{"id":"mlawi","nom":"Mlawi","syn":"mlaoui, mlewi, melaoui, mlawi nature","kcal":302,"p":7.0,"g":45.0,"l":10.0,"f":2.2,"portions":[{"u":"1 mlawi","g":120}],"groupes":["cereales","gras"],"src":"RECETTE","inc":"élevée","note":"Entre 255 kcal/100 g (produit industriel, Open Food Facts) et 335 kcal/100 g (recette maison huilée)."},{"id":"couscous_graine","nom":"Couscous, graine cuite seule","syn":"semoule cuite, graine de couscous, kosksi","kcal":169,"p":3.79,"g":35.7,"l":0.77,"f":1.4,"portions":[{"u":"1 louche","g":110},{"u":"1 assiette de graine","g":250}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":"Graine nature, sans sauce ni matière grasse ajoutée."},{"id":"pates_cuites","nom":"Pâtes cuites nature","syn":"spaghetti, macaroni, pâtes","kcal":151,"p":4.85,"g":29.7,"l":0.75,"f":2.28,"portions":[{"u":"1 assiette","g":250}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"riz_blanc_cuit","nom":"Riz blanc cuit","syn":"riz","kcal":128,"p":2.7,"g":28.5,"l":0.3,"f":0.5,"portions":[{"u":"1 assiette","g":200},{"u":"1 cuillère à soupe","g":25}],"groupes":["cereales"],"src":"USUEL","inc":"moyenne","note":""},{"id":"boulghour_cuit","nom":"Boulghour cuit (borghol)","syn":"borghol, bourghol","kcal":80,"p":3.1,"g":14.1,"l":0.2,"f":4.5,"portions":[{"u":"1 assiette","g":200}],"groupes":["cereales"],"src":"USUEL","inc":"moyenne","note":""},{"id":"pomme_de_terre_eau","nom":"Pomme de terre cuite à l'eau","syn":"pomme de terre vapeur, patate bouillie","kcal":81,"p":1.8,"g":17.0,"l":0.2,"f":1.9,"portions":[{"u":"1 pomme de terre moyenne","g":120}],"groupes":["cereales"],"src":"USUEL","inc":"faible","note":""},{"id":"frites","nom":"Frites","syn":"pommes de terre frites, batata mokli","kcal":295,"p":3.6,"g":37.0,"l":14.0,"f":3.5,"portions":[{"u":"1 portion","g":150}],"groupes":["cereales","gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"croissant","nom":"Croissant","syn":"viennoiserie","kcal":414,"p":7.8,"g":45.0,"l":22.0,"f":2.4,"portions":[{"u":"1 croissant","g":60}],"groupes":["cereales","sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"biscuits_secs","nom":"Biscuits secs (type petit-beurre)","syn":"biscuit, gâteau sec","kcal":440,"p":7.5,"g":73.0,"l":12.5,"f":2.5,"portions":[{"u":"1 biscuit","g":8}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"couscous_agneau","nom":"Couscous à l'agneau (plat complet)","syn":"couscous à la viande, couscous bel allouch, kosksi","kcal":142,"p":6.2,"g":16.7,"l":5.3,"f":1.5,"portions":[{"u":"1 assiette","g":450}],"groupes":["cereales","legumes","vpo","legumineuses"],"src":"RECETTE","inc":"élevée","note":"Graine, sauce, légumes, pois chiches et environ 100 g de viande par assiette."},{"id":"couscous_poulet","nom":"Couscous au poulet (plat complet)","syn":"kosksi bel djej","kcal":136,"p":6.8,"g":16.7,"l":4.3,"f":1.5,"portions":[{"u":"1 assiette","g":450}],"groupes":["cereales","legumes","vpo","legumineuses"],"src":"RECETTE","inc":"élevée","note":""},{"id":"couscous_poisson","nom":"Couscous au poisson (plat complet)","syn":"kosksi bel hout","kcal":124,"p":5.9,"g":16.7,"l":3.4,"f":1.5,"portions":[{"u":"1 assiette","g":450}],"groupes":["cereales","legumes","vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"couscous_legumes","nom":"Couscous aux légumes (sans viande)","syn":"couscous végétarien","kcal":123,"p":2.8,"g":19.8,"l":3.2,"f":1.8,"portions":[{"u":"1 assiette","g":400}],"groupes":["cereales","legumes","legumineuses"],"src":"RECETTE","inc":"élevée","note":""},{"id":"makrouna_viande","nom":"Makrouna (pâtes, sauce tomate et viande)","syn":"macaroni à la tunisienne, pâtes sauce rouge","kcal":161,"p":7.9,"g":18.3,"l":5.9,"f":1.6,"portions":[{"u":"1 assiette","g":350}],"groupes":["cereales","vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"makrouna_sauce","nom":"Makrouna sauce tomate (sans viande)","syn":"pâtes sauce tomate","kcal":152,"p":3.8,"g":22.4,"l":4.8,"f":2.0,"portions":[{"u":"1 assiette","g":300}],"groupes":["cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"ojja_merguez","nom":"Ojja aux merguez","syn":"ojja","kcal":138,"p":7.6,"g":2.6,"l":10.5,"f":1.1,"portions":[{"u":"1 portion","g":300}],"groupes":["vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"chakchouka","nom":"Chakchouka / ojja aux œufs (sans merguez)","syn":"chakchouka, ojja aux œufs","kcal":101,"p":4.6,"g":3.2,"l":7.5,"f":1.3,"portions":[{"u":"1 portion","g":300}],"groupes":["vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"chorba_frik","nom":"Chorba frik à l'agneau","syn":"chorba, soupe au blé vert","kcal":78,"p":4.1,"g":6.3,"l":3.8,"f":1.3,"portions":[{"u":"1 bol","g":300},{"u":"1 louche","g":125}],"groupes":["cereales","vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"chorba_langues","nom":"Chorba langues d'oiseau","syn":"chorba lsan asfour, soupe aux petites pâtes","kcal":69,"p":3.8,"g":7.5,"l":2.5,"f":0.6,"portions":[{"u":"1 bol","g":300},{"u":"1 louche","g":125}],"groupes":["cereales","vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"kafteji","nom":"Kafteji","syn":"keftaji, kefteji","kcal":192,"p":3.1,"g":16.5,"l":12.1,"f":2.1,"portions":[{"u":"1 assiette","g":250}],"groupes":["legumes","cereales","vpo","gras"],"src":"RECETTE","inc":"élevée","note":"Légumes frits : la quantité d'huile absorbée fait varier fortement la valeur."},{"id":"mechouia","nom":"Salade méchouia (sans thon ni œuf)","syn":"slata mechouia, méchouia","kcal":83,"p":1.1,"g":4.2,"l":6.5,"f":1.8,"portions":[{"u":"1 portion","g":120},{"u":"1 cuillère à soupe","g":25}],"groupes":["legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"salade_tunisienne","nom":"Salade tunisienne (sans thon ni œuf)","syn":"slata tounsia","kcal":57,"p":0.8,"g":2.8,"l":4.5,"f":1.0,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"omek_houria","nom":"Omek houria (salade de carottes)","syn":"ommek houria","kcal":83,"p":0.7,"g":5.3,"l":6.0,"f":2.6,"portions":[{"u":"1 portion","g":120}],"groupes":["legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"brik_oeuf","nom":"Brik à l'œuf (frite)","syn":"brik, brika","kcal":257,"p":12.3,"g":10.2,"l":18.4,"f":0.5,"portions":[{"u":"1 brik","g":95}],"groupes":["vpo","cereales","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"lablabi","nom":"Lablabi (sans œuf ni thon)","syn":"lablebi","kcal":100,"p":4.0,"g":13.9,"l":2.7,"f":2.0,"portions":[{"u":"1 bol","g":480}],"groupes":["legumineuses","cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"mloukhia","nom":"Mloukhia au bœuf","syn":"mouloukhia","kcal":184,"p":10.4,"g":1.4,"l":14.8,"f":1.7,"portions":[{"u":"1 portion","g":200}],"groupes":["vpo","legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"tajine_tunisien","nom":"Tajine tunisien (œufs, viande, fromage)","syn":"tajine, tajine malsouka","kcal":251,"p":17.1,"g":10.1,"l":15.6,"f":0.8,"portions":[{"u":"1 part","g":130}],"groupes":["vpo","laitiers","cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"fricasse","nom":"Fricassé garni","syn":"fricassée","kcal":214,"p":9.5,"g":22.3,"l":9.3,"f":1.5,"portions":[{"u":"1 fricassé","g":130},{"u":"1 petit fricassé","g":75}],"groupes":["cereales","vpo","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"sandwich_tunisien","nom":"Sandwich tunisien (thon, œuf, salade, harissa)","syn":"casse-croûte tunisien, sandwich thon","kcal":216,"p":10.5,"g":24.0,"l":8.2,"f":1.9,"portions":[{"u":"1 sandwich (demi-baguette)","g":300}],"groupes":["cereales","vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"riz_djerbien","nom":"Riz djerbien","syn":"rouz jerbi","kcal":166,"p":7.0,"g":20.0,"l":6.0,"f":1.8,"portions":[{"u":"1 assiette","g":300}],"groupes":["cereales","vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"marka","nom":"Ragoût tunisien en sauce (marka, viande et légumes)","syn":"marqa, ragoût, jelbana, loubia en sauce","kcal":122,"p":8.0,"g":6.0,"l":7.0,"f":1.5,"portions":[{"u":"1 portion","g":300}],"groupes":["vpo","legumes"],"src":"RECETTE","inc":"élevée","note":"Catégorie large : la valeur dépend beaucoup de la recette."},{"id":"kammounia","nom":"Kammounia","syn":"kamounia","kcal":172,"p":16.0,"g":3.0,"l":10.5,"f":0.5,"portions":[{"u":"1 portion","g":200}],"groupes":["vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"pizza","nom":"Pizza (part moyenne)","syn":"","kcal":237,"p":10.0,"g":28.0,"l":9.0,"f":2.0,"portions":[{"u":"1 part","g":120},{"u":"1 pizza entière","g":350}],"groupes":["cereales","laitiers"],"src":"USUEL","inc":"élevée","note":""},{"id":"oeuf_dur","nom":"Œuf dur","syn":"œuf, œuf à la coque, œuf mollet, œuf poché","kcal":134,"p":13.5,"g":0.52,"l":8.62,"f":0,"portions":[{"u":"1 œuf","g":50}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":"La table USDA donne 155 kcal/100 g."},{"id":"oeuf_plat","nom":"Œuf au plat","syn":"œuf frit, œuf sur le plat","kcal":205,"p":12.7,"g":2.43,"l":16.0,"f":0,"portions":[{"u":"1 œuf","g":50}],"groupes":["vpo"],"src":"CIQUAL","inc":"moyenne","note":""},{"id":"omelette","nom":"Omelette nature","syn":"omelette","kcal":196,"p":13.8,"g":0.9,"l":15.3,"f":0,"portions":[{"u":"1 omelette de 2 œufs","g":110}],"groupes":["vpo"],"src":"CIQUAL","inc":"moyenne","note":""},{"id":"poulet_roti","nom":"Poulet rôti (viande et peau)","syn":"poulet, poulet grillé, cuisse de poulet","kcal":205,"p":28.8,"g":0,"l":9.88,"f":0,"portions":[{"u":"1 cuisse (sans os)","g":120},{"u":"1 portion","g":130}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":""},{"id":"poulet_blanc","nom":"Blanc de poulet cuit (sans peau)","syn":"escalope de poulet, filet de poulet","kcal":121,"p":26.2,"g":0,"l":1.76,"f":0,"portions":[{"u":"1 blanc","g":130}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":""},{"id":"agneau_cuit","nom":"Agneau cuit (grillé ou braisé)","syn":"viande d'agneau, mouton, allouch, côtelette","kcal":248,"p":25.0,"g":0,"l":16.5,"f":0,"portions":[{"u":"1 portion","g":120},{"u":"1 côtelette (viande)","g":50}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"boeuf_hache_cuit","nom":"Bœuf haché cuit (15 % de matière grasse)","syn":"steak haché, kefta, viande hachée","kcal":248,"p":25.0,"g":0,"l":16.5,"f":0,"portions":[{"u":"1 steak haché","g":100}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"boeuf_grille","nom":"Bœuf grillé (steak)","syn":"steak, viande de bœuf","kcal":175,"p":28.0,"g":0,"l":7.0,"f":0,"portions":[{"u":"1 steak","g":120}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"merguez","nom":"Merguez cuite","syn":"merguez","kcal":283,"p":19.8,"g":0.2,"l":22.6,"f":0,"portions":[{"u":"1 merguez","g":45}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":""},{"id":"dinde_escalope","nom":"Escalope de dinde sautée","syn":"dinde","kcal":134,"p":28.0,"g":0,"l":2.5,"f":0,"portions":[{"u":"1 escalope","g":120}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"poisson_grille","nom":"Poisson grillé (daurade, loup)","syn":"poisson, daurade, loup, poisson au four","kcal":124,"p":22.0,"g":0,"l":4.0,"f":0,"portions":[{"u":"1 portion (chair)","g":150}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"poisson_frit","nom":"Poisson frit","syn":"","kcal":204,"p":20.0,"g":6.0,"l":11.0,"f":0.3,"portions":[{"u":"1 portion (chair)","g":150}],"groupes":["vpo","gras"],"src":"USUEL","inc":"élevée","note":""},{"id":"thon_huile","nom":"Thon à l'huile (égoutté)","syn":"thon, thon en conserve","kcal":194,"p":27.0,"g":0,"l":9.5,"f":0,"portions":[{"u":"1 petite boîte égouttée","g":55},{"u":"1 cuillère à soupe","g":15}],"groupes":["vpo"],"src":"USUEL","inc":"faible","note":""},{"id":"thon_naturel","nom":"Thon au naturel","syn":"","kcal":111,"p":25.5,"g":0,"l":1.0,"f":0,"portions":[{"u":"1 petite boîte égouttée","g":55}],"groupes":["vpo"],"src":"USUEL","inc":"faible","note":""},{"id":"sardine_huile","nom":"Sardines à l'huile (égouttées)","syn":"sardines en conserve","kcal":206,"p":24.5,"g":0,"l":12.0,"f":0,"portions":[{"u":"1 boîte égouttée","g":85},{"u":"1 sardine","g":20}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"sardine_grillee","nom":"Sardines grillées","syn":"sardine","kcal":186,"p":25.0,"g":0,"l":9.5,"f":0,"portions":[{"u":"1 sardine (chair)","g":30},{"u":"1 portion","g":120}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"crevettes","nom":"Crevettes cuites","syn":"","kcal":95,"p":20.5,"g":0.5,"l":1.2,"f":0,"portions":[{"u":"1 portion","g":100}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"pois_chiches","nom":"Pois chiches cuits","syn":"homs, pois chiche","kcal":139,"p":8.86,"g":21.1,"l":1.09,"f":4.8,"portions":[{"u":"1 portion","g":150},{"u":"1 cuillère à soupe","g":25}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"lentilles","nom":"Lentilles cuites","syn":"aads","kcal":112,"p":8.1,"g":16.6,"l":0.55,"f":4.2,"portions":[{"u":"1 assiette","g":250}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"feves","nom":"Fèves cuites","syn":"foul","kcal":61,"p":5.1,"g":6.05,"l":0.8,"f":4.4,"portions":[{"u":"1 portion","g":150}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"haricots_blancs","nom":"Haricots blancs cuits","syn":"loubia nature","kcal":104,"p":8.42,"g":13.6,"l":0.33,"f":6.3,"portions":[{"u":"1 portion","g":200}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"lait_demi","nom":"Lait demi-écrémé","syn":"lait","kcal":46,"p":3.3,"g":4.8,"l":1.55,"f":0,"portions":[{"u":"1 verre","g":200},{"u":"1 bol","g":250}],"groupes":["laitiers"],"src":"USUEL","inc":"faible","note":""},{"id":"lait_entier","nom":"Lait entier","syn":"","kcal":64,"p":3.2,"g":4.7,"l":3.6,"f":0,"portions":[{"u":"1 verre","g":200},{"u":"1 bol","g":250}],"groupes":["laitiers"],"src":"USUEL","inc":"faible","note":""},{"id":"yaourt_nature","nom":"Yaourt nature","syn":"yaourt, yogourt","kcal":58,"p":3.8,"g":5.0,"l":2.5,"f":0,"portions":[{"u":"1 pot","g":110}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"yaourt_sucre","nom":"Yaourt aromatisé ou sucré","syn":"yaourt aux fruits","kcal":87,"p":3.3,"g":13.5,"l":2.2,"f":0,"portions":[{"u":"1 pot","g":110}],"groupes":["laitiers","sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"lben","nom":"Lben (lait fermenté)","syn":"leben, lait fermenté, petit-lait","kcal":40,"p":3.2,"g":4.5,"l":1.0,"f":0,"portions":[{"u":"1 verre","g":200}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"raieb","nom":"Raïeb (lait caillé)","syn":"rayeb, lait caillé","kcal":62,"p":3.3,"g":4.5,"l":3.4,"f":0,"portions":[{"u":"1 bol","g":200}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"fromage_portion","nom":"Fromage fondu en portion (triangle)","syn":"fromage triangle, fromage à tartiner","kcal":246,"p":10.5,"g":6.0,"l":20.0,"f":0,"portions":[{"u":"1 portion","g":16}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"fromage_pate_dure","nom":"Fromage à pâte dure (gruyère, emmental)","syn":"gruyère, emmental, fromage râpé","kcal":375,"p":28.0,"g":0.5,"l":29.0,"f":0,"portions":[{"u":"1 tranche","g":20},{"u":"1 cuillère à soupe de râpé","g":8}],"groupes":["laitiers"],"src":"USUEL","inc":"faible","note":""},{"id":"ricotta","nom":"Ricotta (rigouta)","syn":"rigouta","kcal":151,"p":11.3,"g":4.0,"l":10.0,"f":0,"portions":[{"u":"1 portion","g":60},{"u":"1 cuillère à soupe","g":30}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"beurre","nom":"Beurre","syn":"","kcal":744,"p":0.7,"g":0.7,"l":82.0,"f":0,"portions":[{"u":"1 noisette","g":5},{"u":"1 tartine beurrée","g":10}],"groupes":["gras"],"src":"USUEL","inc":"faible","note":""},{"id":"huile_olive","nom":"Huile d'olive","syn":"zit zitouna","kcal":900,"p":0,"g":0,"l":100.0,"f":0,"portions":[{"u":"1 cuillère à soupe","g":12},{"u":"1 cuillère à café","g":4.5},{"u":"1 filet","g":8}],"groupes":["gras"],"src":"USUEL","inc":"faible","note":""},{"id":"huile_vegetale","nom":"Huile végétale (tournesol, maïs)","syn":"huile","kcal":900,"p":0,"g":0,"l":100.0,"f":0,"portions":[{"u":"1 cuillère à soupe","g":12},{"u":"1 cuillère à café","g":4.5}],"groupes":["gras"],"src":"USUEL","inc":"faible","note":""},{"id":"margarine","nom":"Margarine","syn":"","kcal":722,"p":0,"g":0.4,"l":80.0,"f":0,"portions":[{"u":"1 cuillère à café","g":5}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"mayonnaise","nom":"Mayonnaise","syn":"","kcal":697,"p":1.3,"g":2.0,"l":76.0,"f":0,"portions":[{"u":"1 cuillère à soupe","g":15}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"tomate","nom":"Tomate crue","syn":"tomate","kcal":19,"p":0.9,"g":2.7,"l":0.2,"f":1.2,"portions":[{"u":"1 tomate moyenne","g":120}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"concombre","nom":"Concombre","syn":"","kcal":12,"p":0.6,"g":2.0,"l":0.1,"f":0.6,"portions":[{"u":"1 petit concombre","g":100}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"poivron","nom":"Poivron vert cru","syn":"poivron, felfel","kcal":23,"p":0.9,"g":3.2,"l":0.3,"f":1.8,"portions":[{"u":"1 poivron","g":120}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"carotte","nom":"Carotte crue","syn":"carotte","kcal":39,"p":0.8,"g":7.0,"l":0.3,"f":2.6,"portions":[{"u":"1 carotte","g":80}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"oignon","nom":"Oignon cru","syn":"oignon","kcal":40,"p":1.2,"g":7.5,"l":0.2,"f":1.6,"portions":[{"u":"1 oignon","g":100}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"salade_verte","nom":"Salade verte (laitue)","syn":"laitue, salade","kcal":16,"p":1.3,"g":1.5,"l":0.2,"f":1.4,"portions":[{"u":"1 portion","g":50}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"courgette_cuite","nom":"Courgette cuite","syn":"courgette","kcal":18,"p":1.1,"g":2.0,"l":0.3,"f":1.3,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"aubergine_cuite","nom":"Aubergine cuite (sans friture)","syn":"aubergine","kcal":35,"p":0.8,"g":6.2,"l":0.2,"f":2.5,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"moyenne","note":""},{"id":"haricots_verts","nom":"Haricots verts cuits","syn":"","kcal":35,"p":2.0,"g":4.6,"l":0.2,"f":3.4,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"potiron","nom":"Potiron ou courge cuite","syn":"citrouille, courge","kcal":22,"p":0.7,"g":4.0,"l":0.1,"f":1.1,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"olives_vertes","nom":"Olives vertes","syn":"olives, zitoun","kcal":131,"p":1.1,"g":0.5,"l":13.0,"f":3.8,"portions":[{"u":"1 olive","g":4},{"u":"10 olives","g":40}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"olives_noires","nom":"Olives noires","syn":"","kcal":164,"p":1.2,"g":1.0,"l":16.5,"f":3.5,"portions":[{"u":"1 olive","g":4},{"u":"10 olives","g":40}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"harissa","nom":"Harissa","syn":"hrissa","kcal":85,"p":3.0,"g":9.0,"l":3.0,"f":5.0,"portions":[{"u":"1 cuillère à café","g":8},{"u":"1 cuillère à soupe","g":15}],"groupes":["legumes"],"src":"USUEL","inc":"moyenne","note":""},{"id":"concentre_tomate","nom":"Concentré de tomate","syn":"tomate concentrée","kcal":94,"p":4.5,"g":16.0,"l":0.5,"f":3.8,"portions":[{"u":"1 cuillère à soupe","g":16}],"groupes":["legumes"],"src":"USUEL","inc":"moyenne","note":""},{"id":"orange","nom":"Orange","syn":"","kcal":46,"p":1.0,"g":8.9,"l":0.2,"f":2.2,"portions":[{"u":"1 orange","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"clementine","nom":"Mandarine ou clémentine","syn":"mandarine, clémentine","kcal":46,"p":0.8,"g":9.5,"l":0.2,"f":1.6,"portions":[{"u":"1 mandarine","g":70}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"pomme","nom":"Pomme","syn":"","kcal":53,"p":0.3,"g":11.6,"l":0.2,"f":2.0,"portions":[{"u":"1 pomme","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"banane","nom":"Banane","syn":"","kcal":92,"p":1.1,"g":20.0,"l":0.3,"f":2.3,"portions":[{"u":"1 banane","g":120}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"raisin","nom":"Raisin","syn":"","kcal":71,"p":0.7,"g":16.0,"l":0.2,"f":1.0,"portions":[{"u":"1 grappe","g":120}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"pasteque","nom":"Pastèque","syn":"dellaa","kcal":34,"p":0.6,"g":7.5,"l":0.1,"f":0.4,"portions":[{"u":"1 tranche","g":250}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"melon","nom":"Melon","syn":"battikh","kcal":36,"p":0.8,"g":7.4,"l":0.2,"f":0.9,"portions":[{"u":"1 tranche","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"figue","nom":"Figue fraîche","syn":"figue, karmous","kcal":70,"p":1.0,"g":14.5,"l":0.3,"f":2.6,"portions":[{"u":"1 figue","g":40}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"figue_barbarie","nom":"Figue de barbarie (hindi)","syn":"hindi, figue de Barbarie","kcal":38,"p":0.7,"g":6.0,"l":0.5,"f":3.6,"portions":[{"u":"1 figue (pulpe)","g":60}],"groupes":["fruits"],"src":"USUEL","inc":"moyenne","note":""},{"id":"grenade","nom":"Grenade (grains)","syn":"romman","kcal":80,"p":1.5,"g":14.5,"l":1.0,"f":3.5,"portions":[{"u":"1 grenade (grains)","g":170},{"u":"1 demi-grenade","g":85}],"groupes":["fruits"],"src":"USUEL","inc":"moyenne","note":""},{"id":"peche","nom":"Pêche","syn":"khoukh","kcal":42,"p":0.9,"g":8.3,"l":0.2,"f":1.6,"portions":[{"u":"1 pêche","g":130}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"abricot","nom":"Abricot","syn":"mechmech","kcal":45,"p":1.0,"g":9.0,"l":0.2,"f":1.8,"portions":[{"u":"1 abricot","g":40}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"fraise","nom":"Fraises","syn":"fraise","kcal":32,"p":0.7,"g":5.6,"l":0.3,"f":2.0,"portions":[{"u":"1 portion","g":150},{"u":"1 fraise","g":12}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"poire","nom":"Poire","syn":"","kcal":55,"p":0.4,"g":11.5,"l":0.2,"f":3.0,"portions":[{"u":"1 poire","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"datte","nom":"Datte (Deglet Nour)","syn":"dattes, tmar, deglet nour","kcal":284,"p":1.8,"g":65.0,"l":0.3,"f":7.3,"portions":[{"u":"1 datte dénoyautée","g":8}],"groupes":["fruits","sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"jus_orange","nom":"Jus d'orange pressé","syn":"jus d'orange","kcal":43,"p":0.7,"g":9.5,"l":0.2,"f":0.3,"portions":[{"u":"1 verre","g":200}],"groupes":["fruits","boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"amandes","nom":"Amandes","syn":"amande, louz","kcal":595,"p":21.2,"g":9.1,"l":49.9,"f":12.5,"portions":[{"u":"1 poignée","g":25},{"u":"1 amande","g":1.2}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":"Selon les tables : 579 kcal (USDA) à 634 kcal (Ciqual) pour 100 g."},{"id":"noix","nom":"Noix (cerneaux)","syn":"noix, zouz","kcal":695,"p":15.0,"g":7.0,"l":66.0,"f":6.7,"portions":[{"u":"1 poignée","g":25},{"u":"1 noix","g":5}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"pistaches","nom":"Pistaches grillées","syn":"pistache, fostok","kcal":591,"p":21.0,"g":18.0,"l":46.0,"f":10.3,"portions":[{"u":"1 poignée","g":25}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"cacahuetes","nom":"Cacahuètes grillées salées","syn":"cacahuète, arachides, kakaouia","kcal":618,"p":26.0,"g":12.0,"l":50.0,"f":8.0,"portions":[{"u":"1 poignée","g":25}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"glibettes","nom":"Graines de tournesol décortiquées (glibettes)","syn":"glibettes, graines de tournesol","kcal":599,"p":19.3,"g":12.9,"l":49.8,"f":11.1,"portions":[{"u":"1 poignée","g":20}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"sucre","nom":"Sucre blanc","syn":"sucre","kcal":400,"p":0,"g":100.0,"l":0,"f":0,"portions":[{"u":"1 morceau","g":5},{"u":"1 cuillère à café","g":5},{"u":"1 cuillère à soupe","g":15}],"groupes":["sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"miel","nom":"Miel","syn":"assel","kcal":322,"p":0.4,"g":80.0,"l":0,"f":0,"portions":[{"u":"1 cuillère à café","g":8},{"u":"1 cuillère à soupe","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"confiture","nom":"Confiture","syn":"maajoun","kcal":252,"p":0.4,"g":62.0,"l":0.1,"f":1.0,"portions":[{"u":"1 cuillère à café","g":8},{"u":"1 cuillère à soupe","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"chamia","nom":"Chamia (halwa)","syn":"halwa chamia, halva","kcal":516,"p":12.0,"g":50.0,"l":29.0,"f":3.5,"portions":[{"u":"1 portion","g":30},{"u":"1 cuillère à soupe","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"chocolat_lait","nom":"Chocolat au lait","syn":"chocolat","kcal":533,"p":7.5,"g":56.0,"l":30.5,"f":2.3,"portions":[{"u":"1 carré","g":5},{"u":"1 barre","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"chocolat_noir","nom":"Chocolat noir 70 %","syn":"","kcal":563,"p":7.8,"g":33.0,"l":42.0,"f":11.0,"portions":[{"u":"1 carré","g":5}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"makroudh","nom":"Makroudh","syn":"makroud, maqroudh","kcal":436,"p":6.0,"g":53.0,"l":21.5,"f":3.3,"portions":[{"u":"1 makroudh","g":40}],"groupes":["sucres","cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"baklawa","nom":"Baklawa","syn":"baklava","kcal":459,"p":8.0,"g":40.0,"l":29.0,"f":3.0,"portions":[{"u":"1 pièce","g":35}],"groupes":["sucres"],"src":"RECETTE","inc":"élevée","note":""},{"id":"bambalouni","nom":"Bambalouni (beignet)","syn":"bambalouni, beignet, ftayer","kcal":391,"p":6.0,"g":46.0,"l":20.0,"f":1.5,"portions":[{"u":"1 bambalouni","g":90}],"groupes":["sucres","cereales","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"bsissa","nom":"Bsissa préparée à l'huile d'olive","syn":"bsissa","kcal":494,"p":9.0,"g":48.0,"l":28.0,"f":7.0,"portions":[{"u":"1 portion","g":50},{"u":"1 cuillère à soupe","g":20}],"groupes":["cereales","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"assida_zgougou","nom":"Assida zgougou","syn":"assidat zgougou","kcal":198,"p":4.5,"g":24.0,"l":9.0,"f":1.5,"portions":[{"u":"1 coupe","g":150}],"groupes":["sucres"],"src":"RECETTE","inc":"élevée","note":""},{"id":"droo","nom":"Droo (crème de sorgho)","syn":"drôo, sorgho","kcal":116,"p":3.0,"g":20.0,"l":2.5,"f":1.0,"portions":[{"u":"1 bol","g":200}],"groupes":["cereales","sucres"],"src":"RECETTE","inc":"élevée","note":""},{"id":"eau","nom":"Eau","syn":"","kcal":0,"p":0,"g":0,"l":0,"f":0,"portions":[{"u":"1 verre","g":200}],"groupes":["boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"cafe_noir","nom":"Café noir sans sucre","syn":"café, express, café turc sans sucre","kcal":2,"p":0.2,"g":0.2,"l":0,"f":0,"portions":[{"u":"1 express","g":50},{"u":"1 tasse","g":100}],"groupes":["boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"cafe_lait","nom":"Café au lait non sucré","syn":"café au lait, direct, café crème","kcal":24,"p":1.7,"g":2.5,"l":0.8,"f":0,"portions":[{"u":"1 tasse","g":150},{"u":"1 bol","g":250}],"groupes":["boissons","laitiers"],"src":"USUEL","inc":"moyenne","note":"Moitié café, moitié lait demi-écrémé ; le sucre se compte à part."},{"id":"capucin","nom":"Capucin non sucré","syn":"capucin","kcal":8,"p":0.6,"g":0.8,"l":0.3,"f":0,"portions":[{"u":"1 capucin","g":60}],"groupes":["boissons"],"src":"USUEL","inc":"moyenne","note":""},{"id":"the_menthe_sucre","nom":"Thé à la menthe sucré","syn":"thé, thé vert sucré, tay","kcal":36,"p":0,"g":9.0,"l":0,"f":0,"portions":[{"u":"1 verre à thé","g":80}],"groupes":["boissons","sucres"],"src":"RECETTE","inc":"élevée","note":"Dépend de la quantité de sucre ; environ 7 g de sucre par verre."},{"id":"the_sans_sucre","nom":"Thé ou infusion sans sucre","syn":"tisane, infusion, verveine","kcal":1,"p":0,"g":0.2,"l":0,"f":0,"portions":[{"u":"1 verre à thé","g":80},{"u":"1 tasse","g":200}],"groupes":["boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"soda","nom":"Soda sucré (cola, Boga)","syn":"coca, boga, limonade, gazouz","kcal":42,"p":0,"g":10.5,"l":0,"f":0,"portions":[{"u":"1 canette","g":330},{"u":"1 verre","g":200}],"groupes":["boissons","sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"jus_fruit","nom":"Jus de fruits du commerce ou nectar","syn":"jus, nectar","kcal":48,"p":0.3,"g":11.5,"l":0,"f":0.2,"portions":[{"u":"1 verre","g":200},{"u":"1 briquette","g":200}],"groupes":["boissons","sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"citronnade","nom":"Citronnade tunisienne sucrée","syn":"citronnade, limonada","kcal":53,"p":0.1,"g":13.0,"l":0,"f":0.1,"portions":[{"u":"1 verre","g":200}],"groupes":["boissons","sucres"],"src":"RECETTE","inc":"élevée","note":""}]};</script>
+<script>window.NUTRI_REF = {"version":"2026-11-18","convention":"Valeurs pour 100 g de partie comestible, aliment tel que consommé. Glucides hors fibres. Énergie non relue calculée ainsi : 4 x protéines + 4 x glucides + 9 x lipides + 2 x fibres.","sources":{"CIQUAL":"Table Ciqual 2013 (ANSES), valeur relue lors de la mise en place","CIQUAL2020":"Table Ciqual 2020 (ANSES), valeur relue en novembre 2026","OFF":"Open Food Facts (étiquette d'un produit)","USUEL":"Valeur usuelle des tables Ciqual et USDA, non relue individuellement","RECETTE":"Estimation calculée à partir d'une recette type"},"groupes":{"cereales":"Céréales et féculents","legumes":"Légumes","fruits":"Fruits","legumineuses":"Légumineuses","vpo":"Viandes, poissons, œufs","laitiers":"Produits laitiers","gras":"Matières grasses","sucres":"Produits sucrés","noix":"Fruits à coque et graines","boissons":"Boissons"},"aliments":[{"id":"pain_baguette","nom":"Pain baguette (pain blanc)","syn":"baguette, pain blanc, pain, khobz","kcal":286,"p":9.33,"g":56.6,"l":1.47,"f":3.02,"portions":[{"u":"1 baguette tunisienne","g":220},{"u":"1 demi-baguette","g":110},{"u":"1 quart de baguette","g":55},{"u":"1 morceau","g":50},{"u":"1 tranche","g":25}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"pain_complet","nom":"Pain complet","syn":"pain intégral, pain de son, khobz kamel","kcal":269,"p":9.04,"g":50.6,"l":1.75,"f":5.6,"portions":[{"u":"1 tranche","g":35},{"u":"1 morceau","g":50}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"pain_de_mie","nom":"Pain de mie","syn":"pain toast, toast","kcal":281,"p":8.2,"g":49.2,"l":4.7,"f":2.96,"portions":[{"u":"1 tranche","g":28}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"pain_tabouna","nom":"Pain tabouna","syn":"tabouna, khobz tabouna, pain maison","kcal":270,"p":9.0,"g":54.0,"l":1.3,"f":3.2,"portions":[{"u":"1 pain entier","g":250},{"u":"1 quart","g":60},{"u":"1 morceau","g":60}],"groupes":["cereales"],"src":"RECETTE","inc":"moyenne","note":"Pain de semoule cuit au four traditionnel ; valeur estimée par analogie avec le pain courant."},{"id":"kesra","nom":"Kesra (galette de semoule)","syn":"khobz kesra, galette, kessra","kcal":325,"p":9.3,"g":53.0,"l":7.8,"f":2.7,"portions":[{"u":"1 galette entière","g":300},{"u":"1 quart de galette","g":75},{"u":"1 morceau","g":60}],"groupes":["cereales"],"src":"RECETTE","inc":"élevée","note":"Très variable selon la quantité d'huile (de 270 à 350 kcal/100 g relevés sur des produits)."},{"id":"mlawi","nom":"Mlawi","syn":"mlaoui, mlewi, melaoui, mlawi nature","kcal":302,"p":7.0,"g":45.0,"l":10.0,"f":2.2,"portions":[{"u":"1 mlawi","g":120}],"groupes":["cereales","gras"],"src":"RECETTE","inc":"élevée","note":"Entre 255 kcal/100 g (produit industriel, Open Food Facts) et 335 kcal/100 g (recette maison huilée)."},{"id":"couscous_graine","nom":"Couscous, graine cuite seule","syn":"semoule cuite, graine de couscous, kosksi","kcal":169,"p":3.79,"g":35.7,"l":0.77,"f":1.4,"portions":[{"u":"1 louche","g":110},{"u":"1 assiette de graine","g":250}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":"Graine nature, sans sauce ni matière grasse ajoutée."},{"id":"pates_cuites","nom":"Pâtes cuites nature","syn":"spaghetti, macaroni, pâtes","kcal":151,"p":4.85,"g":29.7,"l":0.75,"f":2.28,"portions":[{"u":"1 assiette","g":250}],"groupes":["cereales"],"src":"CIQUAL","inc":"faible","note":""},{"id":"riz_blanc_cuit","nom":"Riz blanc cuit","syn":"riz","kcal":128,"p":2.7,"g":28.5,"l":0.3,"f":0.5,"portions":[{"u":"1 assiette","g":200},{"u":"1 cuillère à soupe","g":25}],"groupes":["cereales"],"src":"USUEL","inc":"moyenne","note":""},{"id":"boulghour_cuit","nom":"Boulghour cuit (borghol)","syn":"borghol, bourghol","kcal":80,"p":3.1,"g":14.1,"l":0.2,"f":4.5,"portions":[{"u":"1 assiette","g":200}],"groupes":["cereales"],"src":"USUEL","inc":"moyenne","note":""},{"id":"pomme_de_terre_eau","nom":"Pomme de terre cuite à l'eau","syn":"pomme de terre vapeur, patate bouillie","kcal":81,"p":1.8,"g":17.0,"l":0.2,"f":1.9,"portions":[{"u":"1 pomme de terre moyenne","g":120}],"groupes":["cereales"],"src":"USUEL","inc":"faible","note":""},{"id":"frites","nom":"Frites","syn":"pommes de terre frites, batata mokli","kcal":295,"p":3.6,"g":37.0,"l":14.0,"f":3.5,"portions":[{"u":"1 portion","g":150}],"groupes":["cereales","gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"croissant","nom":"Croissant","syn":"viennoiserie","kcal":414,"p":7.8,"g":45.0,"l":22.0,"f":2.4,"portions":[{"u":"1 croissant","g":60}],"groupes":["cereales","sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"biscuits_secs","nom":"Biscuits secs (type petit-beurre)","syn":"biscuit, gâteau sec","kcal":440,"p":7.5,"g":73.0,"l":12.5,"f":2.5,"portions":[{"u":"1 biscuit","g":8}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"couscous_agneau","nom":"Couscous à l'agneau (plat complet)","syn":"couscous à la viande, couscous bel allouch, kosksi","kcal":142,"p":6.2,"g":16.7,"l":5.3,"f":1.5,"portions":[{"u":"1 assiette","g":450}],"groupes":["cereales","legumes","vpo","legumineuses"],"src":"RECETTE","inc":"élevée","note":"Graine, sauce, légumes, pois chiches et environ 100 g de viande par assiette."},{"id":"couscous_poulet","nom":"Couscous au poulet (plat complet)","syn":"kosksi bel djej","kcal":136,"p":6.8,"g":16.7,"l":4.3,"f":1.5,"portions":[{"u":"1 assiette","g":450}],"groupes":["cereales","legumes","vpo","legumineuses"],"src":"RECETTE","inc":"élevée","note":""},{"id":"couscous_poisson","nom":"Couscous au poisson (plat complet)","syn":"kosksi bel hout","kcal":124,"p":5.9,"g":16.7,"l":3.4,"f":1.5,"portions":[{"u":"1 assiette","g":450}],"groupes":["cereales","legumes","vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"couscous_legumes","nom":"Couscous aux légumes (sans viande)","syn":"couscous végétarien","kcal":123,"p":2.8,"g":19.8,"l":3.2,"f":1.8,"portions":[{"u":"1 assiette","g":400}],"groupes":["cereales","legumes","legumineuses"],"src":"RECETTE","inc":"élevée","note":""},{"id":"makrouna_viande","nom":"Makrouna (pâtes, sauce tomate et viande)","syn":"macaroni à la tunisienne, pâtes sauce rouge","kcal":161,"p":7.9,"g":18.3,"l":5.9,"f":1.6,"portions":[{"u":"1 assiette","g":350}],"groupes":["cereales","vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"makrouna_sauce","nom":"Makrouna sauce tomate (sans viande)","syn":"pâtes sauce tomate","kcal":152,"p":3.8,"g":22.4,"l":4.8,"f":2.0,"portions":[{"u":"1 assiette","g":300}],"groupes":["cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"ojja_merguez","nom":"Ojja aux merguez","syn":"ojja","kcal":138,"p":7.6,"g":2.6,"l":10.5,"f":1.1,"portions":[{"u":"1 portion","g":300}],"groupes":["vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"chakchouka","nom":"Chakchouka / ojja aux œufs (sans merguez)","syn":"chakchouka, ojja aux œufs","kcal":101,"p":4.6,"g":3.2,"l":7.5,"f":1.3,"portions":[{"u":"1 portion","g":300}],"groupes":["vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"chorba_frik","nom":"Chorba frik à l'agneau","syn":"chorba, soupe au blé vert","kcal":78,"p":4.1,"g":6.3,"l":3.8,"f":1.3,"portions":[{"u":"1 bol","g":300},{"u":"1 louche","g":125}],"groupes":["cereales","vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"chorba_langues","nom":"Chorba langues d'oiseau","syn":"chorba lsan asfour, soupe aux petites pâtes","kcal":69,"p":3.8,"g":7.5,"l":2.5,"f":0.6,"portions":[{"u":"1 bol","g":300},{"u":"1 louche","g":125}],"groupes":["cereales","vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"kafteji","nom":"Kafteji","syn":"keftaji, kefteji","kcal":192,"p":3.1,"g":16.5,"l":12.1,"f":2.1,"portions":[{"u":"1 assiette","g":250}],"groupes":["legumes","cereales","vpo","gras"],"src":"RECETTE","inc":"élevée","note":"Légumes frits : la quantité d'huile absorbée fait varier fortement la valeur."},{"id":"mechouia","nom":"Salade méchouia (sans thon ni œuf)","syn":"slata mechouia, méchouia","kcal":83,"p":1.1,"g":4.2,"l":6.5,"f":1.8,"portions":[{"u":"1 portion","g":120},{"u":"1 cuillère à soupe","g":25}],"groupes":["legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"salade_tunisienne","nom":"Salade tunisienne (sans thon ni œuf)","syn":"slata tounsia","kcal":57,"p":0.8,"g":2.8,"l":4.5,"f":1.0,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"omek_houria","nom":"Omek houria (salade de carottes)","syn":"ommek houria","kcal":83,"p":0.7,"g":5.3,"l":6.0,"f":2.6,"portions":[{"u":"1 portion","g":120}],"groupes":["legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"brik_oeuf","nom":"Brik à l'œuf (frite)","syn":"brik, brika","kcal":257,"p":12.3,"g":10.2,"l":18.4,"f":0.5,"portions":[{"u":"1 brik","g":95}],"groupes":["vpo","cereales","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"lablabi","nom":"Lablabi (sans œuf ni thon)","syn":"lablebi","kcal":100,"p":4.0,"g":13.9,"l":2.7,"f":2.0,"portions":[{"u":"1 bol","g":480}],"groupes":["legumineuses","cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"mloukhia","nom":"Mloukhia au bœuf","syn":"mouloukhia","kcal":184,"p":10.4,"g":1.4,"l":14.8,"f":1.7,"portions":[{"u":"1 portion","g":200}],"groupes":["vpo","legumes","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"tajine_tunisien","nom":"Tajine tunisien (œufs, viande, fromage)","syn":"tajine, tajine malsouka","kcal":251,"p":17.1,"g":10.1,"l":15.6,"f":0.8,"portions":[{"u":"1 part","g":130}],"groupes":["vpo","laitiers","cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"fricasse","nom":"Fricassé garni","syn":"fricassée","kcal":214,"p":9.5,"g":22.3,"l":9.3,"f":1.5,"portions":[{"u":"1 fricassé","g":130},{"u":"1 petit fricassé","g":75}],"groupes":["cereales","vpo","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"sandwich_tunisien","nom":"Sandwich tunisien (thon, œuf, salade, harissa)","syn":"casse-croûte tunisien, sandwich thon","kcal":216,"p":10.5,"g":24.0,"l":8.2,"f":1.9,"portions":[{"u":"1 sandwich (demi-baguette)","g":300}],"groupes":["cereales","vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"riz_djerbien","nom":"Riz djerbien","syn":"rouz jerbi","kcal":166,"p":7.0,"g":20.0,"l":6.0,"f":1.8,"portions":[{"u":"1 assiette","g":300}],"groupes":["cereales","vpo","legumes"],"src":"RECETTE","inc":"élevée","note":""},{"id":"marka","nom":"Ragoût tunisien en sauce (marka, viande et légumes)","syn":"marqa, ragoût, jelbana, loubia en sauce","kcal":122,"p":8.0,"g":6.0,"l":7.0,"f":1.5,"portions":[{"u":"1 portion","g":300}],"groupes":["vpo","legumes"],"src":"RECETTE","inc":"élevée","note":"Catégorie large : la valeur dépend beaucoup de la recette."},{"id":"kammounia","nom":"Kammounia","syn":"kamounia","kcal":172,"p":16.0,"g":3.0,"l":10.5,"f":0.5,"portions":[{"u":"1 portion","g":200}],"groupes":["vpo"],"src":"RECETTE","inc":"élevée","note":""},{"id":"pizza","nom":"Pizza (part moyenne)","syn":"","kcal":237,"p":10.0,"g":28.0,"l":9.0,"f":2.0,"portions":[{"u":"1 part","g":120},{"u":"1 pizza entière","g":350}],"groupes":["cereales","laitiers"],"src":"USUEL","inc":"élevée","note":""},{"id":"oeuf_dur","nom":"Œuf dur","syn":"œuf, œuf à la coque, œuf mollet, œuf poché","kcal":134,"p":13.5,"g":0.52,"l":8.62,"f":0,"portions":[{"u":"1 œuf","g":50}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":"La table USDA donne 155 kcal/100 g."},{"id":"oeuf_plat","nom":"Œuf au plat","syn":"œuf frit, œuf sur le plat","kcal":205,"p":12.7,"g":2.43,"l":16.0,"f":0,"portions":[{"u":"1 œuf","g":50}],"groupes":["vpo"],"src":"CIQUAL","inc":"moyenne","note":""},{"id":"omelette","nom":"Omelette nature","syn":"omelette","kcal":196,"p":13.8,"g":0.9,"l":15.3,"f":0,"portions":[{"u":"1 omelette de 2 œufs","g":110}],"groupes":["vpo"],"src":"CIQUAL","inc":"moyenne","note":""},{"id":"poulet_roti","nom":"Poulet rôti (viande et peau)","syn":"poulet, poulet grillé, cuisse de poulet","kcal":205,"p":28.8,"g":0,"l":9.88,"f":0,"portions":[{"u":"1 cuisse (sans os)","g":120},{"u":"1 portion","g":130}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":""},{"id":"poulet_blanc","nom":"Blanc de poulet cuit (sans peau)","syn":"escalope de poulet, filet de poulet","kcal":121,"p":26.2,"g":0,"l":1.76,"f":0,"portions":[{"u":"1 blanc","g":130}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":""},{"id":"agneau_cuit","nom":"Agneau cuit (grillé ou braisé)","syn":"viande d'agneau, mouton, allouch, côtelette","kcal":248,"p":25.0,"g":0,"l":16.5,"f":0,"portions":[{"u":"1 portion","g":120},{"u":"1 côtelette (viande)","g":50}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"boeuf_hache_cuit","nom":"Bœuf haché cuit (15 % de matière grasse)","syn":"steak haché, kefta, viande hachée","kcal":248,"p":25.0,"g":0,"l":16.5,"f":0,"portions":[{"u":"1 steak haché","g":100}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"boeuf_grille","nom":"Bœuf grillé (steak)","syn":"steak, viande de bœuf","kcal":175,"p":28.0,"g":0,"l":7.0,"f":0,"portions":[{"u":"1 steak","g":120}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"merguez","nom":"Merguez cuite","syn":"merguez","kcal":283,"p":19.8,"g":0.2,"l":22.6,"f":0,"portions":[{"u":"1 merguez","g":45}],"groupes":["vpo"],"src":"CIQUAL","inc":"faible","note":""},{"id":"dinde_escalope","nom":"Escalope de dinde sautée","syn":"dinde","kcal":134,"p":28.0,"g":0,"l":2.5,"f":0,"portions":[{"u":"1 escalope","g":120}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"poisson_grille","nom":"Poisson grillé (daurade, loup)","syn":"poisson, daurade, loup, poisson au four","kcal":124,"p":22.0,"g":0,"l":4.0,"f":0,"portions":[{"u":"1 portion (chair)","g":150}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"poisson_frit","nom":"Poisson frit","syn":"","kcal":204,"p":20.0,"g":6.0,"l":11.0,"f":0.3,"portions":[{"u":"1 portion (chair)","g":150}],"groupes":["vpo","gras"],"src":"USUEL","inc":"élevée","note":""},{"id":"thon_huile","nom":"Thon à l'huile (égoutté)","syn":"thon, thon en conserve","kcal":194,"p":27.0,"g":0,"l":9.5,"f":0,"portions":[{"u":"1 petite boîte égouttée","g":55},{"u":"1 cuillère à soupe","g":15}],"groupes":["vpo"],"src":"USUEL","inc":"faible","note":""},{"id":"thon_naturel","nom":"Thon au naturel","syn":"","kcal":111,"p":25.5,"g":0,"l":1.0,"f":0,"portions":[{"u":"1 petite boîte égouttée","g":55}],"groupes":["vpo"],"src":"USUEL","inc":"faible","note":""},{"id":"sardine_huile","nom":"Sardines à l'huile (égouttées)","syn":"sardines en conserve","kcal":206,"p":24.5,"g":0,"l":12.0,"f":0,"portions":[{"u":"1 boîte égouttée","g":85},{"u":"1 sardine","g":20}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"sardine_grillee","nom":"Sardines grillées","syn":"sardine","kcal":186,"p":25.0,"g":0,"l":9.5,"f":0,"portions":[{"u":"1 sardine (chair)","g":30},{"u":"1 portion","g":120}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"crevettes","nom":"Crevettes cuites","syn":"","kcal":95,"p":20.5,"g":0.5,"l":1.2,"f":0,"portions":[{"u":"1 portion","g":100}],"groupes":["vpo"],"src":"USUEL","inc":"moyenne","note":""},{"id":"pois_chiches","nom":"Pois chiches cuits","syn":"homs, pois chiche","kcal":139,"p":8.86,"g":21.1,"l":1.09,"f":4.8,"portions":[{"u":"1 portion","g":150},{"u":"1 cuillère à soupe","g":25}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"lentilles","nom":"Lentilles cuites","syn":"aads","kcal":112,"p":8.1,"g":16.6,"l":0.55,"f":4.2,"portions":[{"u":"1 assiette","g":250}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"feves","nom":"Fèves cuites","syn":"foul","kcal":61,"p":5.1,"g":6.05,"l":0.8,"f":4.4,"portions":[{"u":"1 portion","g":150}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"haricots_blancs","nom":"Haricots blancs cuits","syn":"loubia nature","kcal":104,"p":8.42,"g":13.6,"l":0.33,"f":6.3,"portions":[{"u":"1 portion","g":200}],"groupes":["legumineuses"],"src":"CIQUAL","inc":"faible","note":""},{"id":"lait_demi","nom":"Lait demi-écrémé","syn":"lait","kcal":46,"p":3.3,"g":4.8,"l":1.55,"f":0,"portions":[{"u":"1 verre","g":200},{"u":"1 bol","g":250}],"groupes":["laitiers"],"src":"USUEL","inc":"faible","note":""},{"id":"lait_entier","nom":"Lait entier","syn":"","kcal":64,"p":3.2,"g":4.7,"l":3.6,"f":0,"portions":[{"u":"1 verre","g":200},{"u":"1 bol","g":250}],"groupes":["laitiers"],"src":"USUEL","inc":"faible","note":""},{"id":"yaourt_nature","nom":"Yaourt nature","syn":"yaourt, yogourt","kcal":58,"p":3.8,"g":5.0,"l":2.5,"f":0,"portions":[{"u":"1 pot","g":110}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"yaourt_sucre","nom":"Yaourt aromatisé ou sucré","syn":"yaourt aux fruits","kcal":87,"p":3.3,"g":13.5,"l":2.2,"f":0,"portions":[{"u":"1 pot","g":110}],"groupes":["laitiers","sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"lben","nom":"Lben (lait fermenté)","syn":"leben, lait fermenté, petit-lait","kcal":40,"p":3.2,"g":4.5,"l":1.0,"f":0,"portions":[{"u":"1 verre","g":200}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"raieb","nom":"Raïeb (lait caillé)","syn":"rayeb, lait caillé","kcal":62,"p":3.3,"g":4.5,"l":3.4,"f":0,"portions":[{"u":"1 bol","g":200}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"fromage_portion","nom":"Fromage fondu en portion (triangle)","syn":"fromage triangle, fromage à tartiner","kcal":246,"p":10.5,"g":6.0,"l":20.0,"f":0,"portions":[{"u":"1 portion","g":16}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"fromage_pate_dure","nom":"Fromage à pâte dure (gruyère, emmental)","syn":"gruyère, emmental, fromage râpé","kcal":375,"p":28.0,"g":0.5,"l":29.0,"f":0,"portions":[{"u":"1 tranche","g":20},{"u":"1 cuillère à soupe de râpé","g":8}],"groupes":["laitiers"],"src":"USUEL","inc":"faible","note":""},{"id":"ricotta","nom":"Ricotta (rigouta)","syn":"rigouta","kcal":151,"p":11.3,"g":4.0,"l":10.0,"f":0,"portions":[{"u":"1 portion","g":60},{"u":"1 cuillère à soupe","g":30}],"groupes":["laitiers"],"src":"USUEL","inc":"moyenne","note":""},{"id":"beurre","nom":"Beurre","syn":"","kcal":744,"p":0.7,"g":0.7,"l":82.0,"f":0,"portions":[{"u":"1 noisette","g":5},{"u":"1 tartine beurrée","g":10}],"groupes":["gras"],"src":"USUEL","inc":"faible","note":""},{"id":"huile_olive","nom":"Huile d'olive","syn":"zit zitouna","kcal":900,"p":0,"g":0,"l":100.0,"f":0,"portions":[{"u":"1 cuillère à soupe","g":12},{"u":"1 cuillère à café","g":4.5},{"u":"1 filet","g":8}],"groupes":["gras"],"src":"USUEL","inc":"faible","note":""},{"id":"huile_vegetale","nom":"Huile végétale (tournesol, maïs)","syn":"huile","kcal":900,"p":0,"g":0,"l":100.0,"f":0,"portions":[{"u":"1 cuillère à soupe","g":12},{"u":"1 cuillère à café","g":4.5}],"groupes":["gras"],"src":"USUEL","inc":"faible","note":""},{"id":"margarine","nom":"Margarine","syn":"","kcal":722,"p":0,"g":0.4,"l":80.0,"f":0,"portions":[{"u":"1 cuillère à café","g":5}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"mayonnaise","nom":"Mayonnaise","syn":"","kcal":697,"p":1.3,"g":2.0,"l":76.0,"f":0,"portions":[{"u":"1 cuillère à soupe","g":15}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"tomate","nom":"Tomate crue","syn":"tomate","kcal":19,"p":0.9,"g":2.7,"l":0.2,"f":1.2,"portions":[{"u":"1 tomate moyenne","g":120}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"concombre","nom":"Concombre","syn":"","kcal":12,"p":0.6,"g":2.0,"l":0.1,"f":0.6,"portions":[{"u":"1 petit concombre","g":100}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"poivron","nom":"Poivron vert cru","syn":"poivron, felfel","kcal":23,"p":0.9,"g":3.2,"l":0.3,"f":1.8,"portions":[{"u":"1 poivron","g":120}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"carotte","nom":"Carotte crue","syn":"carotte","kcal":39,"p":0.8,"g":7.0,"l":0.3,"f":2.6,"portions":[{"u":"1 carotte","g":80}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"oignon","nom":"Oignon cru","syn":"oignon","kcal":40,"p":1.2,"g":7.5,"l":0.2,"f":1.6,"portions":[{"u":"1 oignon","g":100}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"salade_verte","nom":"Salade verte (laitue)","syn":"laitue, salade","kcal":16,"p":1.3,"g":1.5,"l":0.2,"f":1.4,"portions":[{"u":"1 portion","g":50}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"courgette_cuite","nom":"Courgette cuite","syn":"courgette","kcal":18,"p":1.1,"g":2.0,"l":0.3,"f":1.3,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"aubergine_cuite","nom":"Aubergine cuite (sans friture)","syn":"aubergine","kcal":35,"p":0.8,"g":6.2,"l":0.2,"f":2.5,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"moyenne","note":""},{"id":"haricots_verts","nom":"Haricots verts cuits","syn":"","kcal":35,"p":2.0,"g":4.6,"l":0.2,"f":3.4,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"potiron","nom":"Potiron ou courge cuite","syn":"citrouille, courge","kcal":22,"p":0.7,"g":4.0,"l":0.1,"f":1.1,"portions":[{"u":"1 portion","g":150}],"groupes":["legumes"],"src":"USUEL","inc":"faible","note":""},{"id":"olives_vertes","nom":"Olives vertes","syn":"olives, zitoun","kcal":131,"p":1.1,"g":0.5,"l":13.0,"f":3.8,"portions":[{"u":"1 olive","g":4},{"u":"10 olives","g":40}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"olives_noires","nom":"Olives noires","syn":"","kcal":164,"p":1.2,"g":1.0,"l":16.5,"f":3.5,"portions":[{"u":"1 olive","g":4},{"u":"10 olives","g":40}],"groupes":["gras"],"src":"USUEL","inc":"moyenne","note":""},{"id":"harissa","nom":"Harissa","syn":"hrissa","kcal":85,"p":3.0,"g":9.0,"l":3.0,"f":5.0,"portions":[{"u":"1 cuillère à café","g":8},{"u":"1 cuillère à soupe","g":15}],"groupes":["legumes"],"src":"USUEL","inc":"moyenne","note":""},{"id":"concentre_tomate","nom":"Concentré de tomate","syn":"tomate concentrée","kcal":94,"p":4.5,"g":16.0,"l":0.5,"f":3.8,"portions":[{"u":"1 cuillère à soupe","g":16}],"groupes":["legumes"],"src":"USUEL","inc":"moyenne","note":""},{"id":"orange","nom":"Orange","syn":"","kcal":46,"p":1.0,"g":8.9,"l":0.2,"f":2.2,"portions":[{"u":"1 orange","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"clementine","nom":"Mandarine ou clémentine","syn":"mandarine, clémentine","kcal":46,"p":0.8,"g":9.5,"l":0.2,"f":1.6,"portions":[{"u":"1 mandarine","g":70}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"pomme","nom":"Pomme","syn":"","kcal":53,"p":0.3,"g":11.6,"l":0.2,"f":2.0,"portions":[{"u":"1 pomme","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"banane","nom":"Banane","syn":"","kcal":92,"p":1.1,"g":20.0,"l":0.3,"f":2.3,"portions":[{"u":"1 banane","g":120}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"raisin","nom":"Raisin","syn":"","kcal":71,"p":0.7,"g":16.0,"l":0.2,"f":1.0,"portions":[{"u":"1 grappe","g":120}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"pasteque","nom":"Pastèque","syn":"dellaa","kcal":34,"p":0.6,"g":7.5,"l":0.1,"f":0.4,"portions":[{"u":"1 tranche","g":250}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"melon","nom":"Melon","syn":"battikh","kcal":36,"p":0.8,"g":7.4,"l":0.2,"f":0.9,"portions":[{"u":"1 tranche","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"figue","nom":"Figue fraîche","syn":"figue, karmous","kcal":70,"p":1.0,"g":14.5,"l":0.3,"f":2.6,"portions":[{"u":"1 figue","g":40}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"figue_barbarie","nom":"Figue de barbarie (hindi)","syn":"hindi, figue de Barbarie","kcal":38,"p":0.7,"g":6.0,"l":0.5,"f":3.6,"portions":[{"u":"1 figue (pulpe)","g":60}],"groupes":["fruits"],"src":"USUEL","inc":"moyenne","note":""},{"id":"grenade","nom":"Grenade (grains)","syn":"romman","kcal":80,"p":1.5,"g":14.5,"l":1.0,"f":3.5,"portions":[{"u":"1 grenade (grains)","g":170},{"u":"1 demi-grenade","g":85}],"groupes":["fruits"],"src":"USUEL","inc":"moyenne","note":""},{"id":"peche","nom":"Pêche","syn":"khoukh","kcal":42,"p":0.9,"g":8.3,"l":0.2,"f":1.6,"portions":[{"u":"1 pêche","g":130}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"abricot","nom":"Abricot","syn":"mechmech","kcal":45,"p":1.0,"g":9.0,"l":0.2,"f":1.8,"portions":[{"u":"1 abricot","g":40}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"fraise","nom":"Fraises","syn":"fraise","kcal":32,"p":0.7,"g":5.6,"l":0.3,"f":2.0,"portions":[{"u":"1 portion","g":150},{"u":"1 fraise","g":12}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"poire","nom":"Poire","syn":"","kcal":55,"p":0.4,"g":11.5,"l":0.2,"f":3.0,"portions":[{"u":"1 poire","g":150}],"groupes":["fruits"],"src":"USUEL","inc":"faible","note":""},{"id":"datte","nom":"Datte (Deglet Nour)","syn":"dattes, tmar, deglet nour","kcal":284,"p":1.8,"g":65.0,"l":0.3,"f":7.3,"portions":[{"u":"1 datte dénoyautée","g":8}],"groupes":["fruits","sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"jus_orange","nom":"Jus d'orange pressé","syn":"jus d'orange","kcal":43,"p":0.7,"g":9.5,"l":0.2,"f":0.3,"portions":[{"u":"1 verre","g":200}],"groupes":["fruits","boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"amandes","nom":"Amandes","syn":"amande, louz","kcal":595,"p":21.2,"g":9.1,"l":49.9,"f":12.5,"portions":[{"u":"1 poignée","g":25},{"u":"1 amande","g":1.2}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":"Selon les tables : 579 kcal (USDA) à 634 kcal (Ciqual) pour 100 g."},{"id":"noisettes","nom":"Noisettes","syn":"noisette, noisettes décortiquées, bondok, bandak","kcal":622,"p":17.0,"g":7.16,"l":56.9,"f":11.6,"portions":[{"u":"1 poignée","g":25},{"u":"10 noisettes","g":14},{"u":"1 noisette","g":1.4}],"groupes":["noix"],"src":"CIQUAL2020","inc":"moyenne","note":"Noisette décortiquée, nature. Selon les tables : 622 kcal (Ciqual 2020) à 683 kcal (Ciqual 2013) pour 100 g ; grillée, environ 646 kcal (USDA)."},{"id":"noix","nom":"Noix (cerneaux)","syn":"noix, zouz","kcal":695,"p":15.0,"g":7.0,"l":66.0,"f":6.7,"portions":[{"u":"1 poignée","g":25},{"u":"1 noix","g":5}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"pistaches","nom":"Pistaches grillées","syn":"pistache, fostok","kcal":591,"p":21.0,"g":18.0,"l":46.0,"f":10.3,"portions":[{"u":"1 poignée","g":25}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"cacahuetes","nom":"Cacahuètes grillées salées","syn":"cacahuète, arachides, kakaouia","kcal":618,"p":26.0,"g":12.0,"l":50.0,"f":8.0,"portions":[{"u":"1 poignée","g":25}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"glibettes","nom":"Graines de tournesol décortiquées (glibettes)","syn":"glibettes, graines de tournesol","kcal":599,"p":19.3,"g":12.9,"l":49.8,"f":11.1,"portions":[{"u":"1 poignée","g":20}],"groupes":["noix"],"src":"USUEL","inc":"moyenne","note":""},{"id":"sucre","nom":"Sucre blanc","syn":"sucre","kcal":400,"p":0,"g":100.0,"l":0,"f":0,"portions":[{"u":"1 morceau","g":5},{"u":"1 cuillère à café","g":5},{"u":"1 cuillère à soupe","g":15}],"groupes":["sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"miel","nom":"Miel","syn":"assel","kcal":322,"p":0.4,"g":80.0,"l":0,"f":0,"portions":[{"u":"1 cuillère à café","g":8},{"u":"1 cuillère à soupe","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"confiture","nom":"Confiture","syn":"maajoun","kcal":252,"p":0.4,"g":62.0,"l":0.1,"f":1.0,"portions":[{"u":"1 cuillère à café","g":8},{"u":"1 cuillère à soupe","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"chamia","nom":"Chamia (halwa)","syn":"halwa chamia, halva","kcal":516,"p":12.0,"g":50.0,"l":29.0,"f":3.5,"portions":[{"u":"1 portion","g":30},{"u":"1 cuillère à soupe","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"chocolat_lait","nom":"Chocolat au lait","syn":"chocolat","kcal":533,"p":7.5,"g":56.0,"l":30.5,"f":2.3,"portions":[{"u":"1 carré","g":5},{"u":"1 barre","g":20}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"chocolat_noir","nom":"Chocolat noir 70 %","syn":"","kcal":563,"p":7.8,"g":33.0,"l":42.0,"f":11.0,"portions":[{"u":"1 carré","g":5}],"groupes":["sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"makroudh","nom":"Makroudh","syn":"makroud, maqroudh","kcal":436,"p":6.0,"g":53.0,"l":21.5,"f":3.3,"portions":[{"u":"1 makroudh","g":40}],"groupes":["sucres","cereales"],"src":"RECETTE","inc":"élevée","note":""},{"id":"baklawa","nom":"Baklawa","syn":"baklava","kcal":459,"p":8.0,"g":40.0,"l":29.0,"f":3.0,"portions":[{"u":"1 pièce","g":35}],"groupes":["sucres"],"src":"RECETTE","inc":"élevée","note":""},{"id":"bambalouni","nom":"Bambalouni (beignet)","syn":"bambalouni, beignet, ftayer","kcal":391,"p":6.0,"g":46.0,"l":20.0,"f":1.5,"portions":[{"u":"1 bambalouni","g":90}],"groupes":["sucres","cereales","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"bsissa","nom":"Bsissa préparée à l'huile d'olive","syn":"bsissa","kcal":494,"p":9.0,"g":48.0,"l":28.0,"f":7.0,"portions":[{"u":"1 portion","g":50},{"u":"1 cuillère à soupe","g":20}],"groupes":["cereales","gras"],"src":"RECETTE","inc":"élevée","note":""},{"id":"assida_zgougou","nom":"Assida zgougou","syn":"assidat zgougou","kcal":198,"p":4.5,"g":24.0,"l":9.0,"f":1.5,"portions":[{"u":"1 coupe","g":150}],"groupes":["sucres"],"src":"RECETTE","inc":"élevée","note":""},{"id":"droo","nom":"Droo (crème de sorgho)","syn":"drôo, sorgho","kcal":116,"p":3.0,"g":20.0,"l":2.5,"f":1.0,"portions":[{"u":"1 bol","g":200}],"groupes":["cereales","sucres"],"src":"RECETTE","inc":"élevée","note":""},{"id":"eau","nom":"Eau","syn":"","kcal":0,"p":0,"g":0,"l":0,"f":0,"portions":[{"u":"1 verre","g":200}],"groupes":["boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"cafe_noir","nom":"Café noir sans sucre","syn":"café, express, café turc sans sucre","kcal":2,"p":0.2,"g":0.2,"l":0,"f":0,"portions":[{"u":"1 express","g":50},{"u":"1 tasse","g":100}],"groupes":["boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"cafe_lait","nom":"Café au lait non sucré","syn":"café au lait, direct, café crème","kcal":24,"p":1.7,"g":2.5,"l":0.8,"f":0,"portions":[{"u":"1 tasse","g":150},{"u":"1 bol","g":250}],"groupes":["boissons","laitiers"],"src":"USUEL","inc":"moyenne","note":"Moitié café, moitié lait demi-écrémé ; le sucre se compte à part."},{"id":"capucin","nom":"Capucin non sucré","syn":"capucin","kcal":8,"p":0.6,"g":0.8,"l":0.3,"f":0,"portions":[{"u":"1 capucin","g":60}],"groupes":["boissons"],"src":"USUEL","inc":"moyenne","note":""},{"id":"the_menthe_sucre","nom":"Thé à la menthe sucré","syn":"thé, thé vert sucré, tay","kcal":36,"p":0,"g":9.0,"l":0,"f":0,"portions":[{"u":"1 verre à thé","g":80}],"groupes":["boissons","sucres"],"src":"RECETTE","inc":"élevée","note":"Dépend de la quantité de sucre ; environ 7 g de sucre par verre."},{"id":"the_sans_sucre","nom":"Thé ou infusion sans sucre","syn":"tisane, infusion, verveine","kcal":1,"p":0,"g":0.2,"l":0,"f":0,"portions":[{"u":"1 verre à thé","g":80},{"u":"1 tasse","g":200}],"groupes":["boissons"],"src":"USUEL","inc":"faible","note":""},{"id":"soda","nom":"Soda sucré (cola, Boga)","syn":"coca, boga, limonade, gazouz","kcal":42,"p":0,"g":10.5,"l":0,"f":0,"portions":[{"u":"1 canette","g":330},{"u":"1 verre","g":200}],"groupes":["boissons","sucres"],"src":"USUEL","inc":"faible","note":""},{"id":"jus_fruit","nom":"Jus de fruits du commerce ou nectar","syn":"jus, nectar","kcal":48,"p":0.3,"g":11.5,"l":0,"f":0.2,"portions":[{"u":"1 verre","g":200},{"u":"1 briquette","g":200}],"groupes":["boissons","sucres"],"src":"USUEL","inc":"moyenne","note":""},{"id":"citronnade","nom":"Citronnade tunisienne sucrée","syn":"citronnade, limonada","kcal":53,"p":0.1,"g":13.0,"l":0,"f":0.1,"portions":[{"u":"1 verre","g":200}],"groupes":["boissons","sucres"],"src":"RECETTE","inc":"élevée","note":""}]};</script>
 <script>
 /* Suivi nutritionnel — logique pure : dates, calculs, dépense énergétique, agrégats,
    contrôle des réponses de Claude, sauvegarde, exports. Sans dépendance au navigateur. */
@@ -511,29 +514,245 @@ button { cursor: pointer; }
   }
 
   // ------------------------------------------------------ table de référence
-  var REF = { list: [], byId: {}, groupes: {}, doc: null };
+  var REF = { list: [], byId: {}, groupes: {}, doc: null, cle: {}, synCle: {} };
   function norm(s) {
     return String(s == null ? '' : s).toLowerCase().replace(/œ/g, 'oe').replace(/æ/g, 'ae')
       .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+  // Clé de rapprochement des noms d'aliments : accents, articles et pluriels ignorés
+  // (« Noisettes » et « noisette » donnent la même clé ; « Noisettes grillées », une autre).
+  var MOTS_VIDES = { de: 1, du: 1, des: 1, d: 1, la: 1, le: 1, les: 1, l: 1, a: 1, au: 1, aux: 1, en: 1, et: 1, un: 1, une: 1 };
+  function cleAliment(nom) {
+    return norm(nom).split(' ').filter(function (w) { return w && !MOTS_VIDES[w]; }).map(function (w) {
+      return w.length > 3 && /[sx]$/.test(w) && !/ss$/.test(w) ? w.slice(0, -1) : w;
+    }).join(' ');
   }
   function setRef(doc) {
     REF.doc = doc;
     REF.list = (doc && doc.aliments) || [];
     REF.groupes = (doc && doc.groupes) || {};
     REF.byId = {};
-    REF.list.forEach(function (a) { REF.byId[a.id] = a; a._n = norm(a.nom); a._s = norm(a.syn); });
+    REF.cle = {};
+    REF.synCle = {};
+    REF.list.forEach(function (a) {
+      REF.byId[a.id] = a; a._n = norm(a.nom); a._s = norm(a.syn);
+      // Nom complet et nom sans précision entre parenthèses ; une clé partagée par deux aliments ne sert pas.
+      [a.nom, a.nom.replace(/\([^)]*\)/g, ' ')].forEach(function (n) {
+        var k = cleAliment(n);
+        if (!k) return;
+        if (REF.cle[k] === undefined) REF.cle[k] = a; else if (REF.cle[k] !== a) REF.cle[k] = null;
+      });
+    });
+    // Autres noms (« bondok », « baguette ») : ils ne remplacent pas une estimation de Claude, mais un aliment
+    // ainsi nommé n'entre pas dans Mes aliments, pour ne pas doubler une ligne de la table.
+    REF.list.forEach(function (a) {
+      String(a.syn || '').split(',').forEach(function (n) {
+        var k = cleAliment(n);
+        if (!k || REF.cle[k] !== undefined) return;
+        if (REF.synCle[k] === undefined) REF.synCle[k] = a; else if (REF.synCle[k] !== a) REF.synCle[k] = null;
+      });
+    });
   }
+  function couvertParLaTable(k) { return !!(REF.cle[k] || REF.synCle[k] || REF.cle[k] === null || REF.synCle[k] === null); }
   function refPer100(a) { return { kcal: a.kcal, p: a.p, g: a.g, l: a.l, f: a.f }; }
-  // Table des aliments consultable : texte (nom et autres noms, accents ignorés), famille ou « recettes », puis tri.
+
+  // ------------------------------------------------------------ Mes aliments
+  // Un aliment absent de la table est rangé dans « Mes aliments » à sa première saisie, avec ses valeurs pour 100 g
+  // (estimation de Claude ou valeurs saisies par la personne). Les saisies suivantes reprennent ces valeurs :
+  // même aliment, même quantité, mêmes calories. Les lignes déjà enregistrées ne changent que sur demande.
+  function sanitizePerso(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    var id = typeof raw.id === 'string' && /^[A-Za-z0-9_-]{4,40}$/.test(raw.id) ? raw.id : null;
+    var nom = clip(str(raw.nom), 80), s = sanitizePer100(raw.per100), o = raw.origine && typeof raw.origine === 'object' ? raw.origine : {};
+    if (!id || !nom || !cleAliment(nom) || !s.ok) return null;
+    return {
+      id: id, nom: nom, per100: s.per100, src: raw.src === 'manuel' ? 'manuel' : 'ia',
+      syn: (Array.isArray(raw.syn) ? raw.syn : []).map(function (x) { return clip(str(x), 80); }).filter(function (x) { return x && cleAliment(x); }).slice(0, 8),
+      unc: UNC.indexOf(raw.unc) >= 0 ? raw.unc : 'moyenne',
+      groups: (Array.isArray(raw.groups) ? raw.groups : []).filter(function (g) { return typeof g === 'string' && g.length < 20; }).slice(0, 6),
+      origine: { mode: o.mode === 'journal' ? 'journal' : 'saisie', date: isDate(o.date) ? o.date : null, n: numOk(toNum(o.n), 0, 1e6) ? rnd(toNum(o.n)) : 0 },
+      variantes: (Array.isArray(raw.variantes) ? raw.variantes : []).slice(0, 8).map(function (v) { return { kcal: toNum(v && v.kcal), n: toNum(v && v.n) }; })
+        .filter(function (v) { return numOk(v.kcal, 0, 905) && numOk(v.n, 1, 1e6); }),
+      hist: (Array.isArray(raw.hist) ? raw.hist : []).slice(0, 50).map(function (h) {
+        return { at: str(h && h.at), champ: clip(str(h && h.champ), 40), de: clip(h && h.de != null ? String(h.de) : '', 80), a: clip(h && h.a != null ? String(h.a) : '', 80) };
+      }),
+      createdAt: str(raw.createdAt) || new Date(0).toISOString(), updatedAt: str(raw.updatedAt) || null,
+      status: raw.status === 'retire' ? 'retire' : 'active'
+    };
+  }
+  // x : { nom, per100, src, unc, groups, mode ('saisie' ou 'journal'), date, n, variantes }
+  function makePerso(x, nowIso) {
+    return {
+      id: x.id || newId('m'), nom: clip(str(x.nom), 80), per100: clone(x.per100), src: x.src === 'manuel' ? 'manuel' : 'ia', syn: [],
+      unc: UNC.indexOf(x.unc) >= 0 ? x.unc : 'moyenne', groups: (x.groups || []).slice(0, 6),
+      origine: { mode: x.mode === 'journal' ? 'journal' : 'saisie', date: isDate(x.date) ? x.date : null, n: x.n || 0 },
+      variantes: (x.variantes || []).slice(0, 8), hist: [],
+      createdAt: nowIso, updatedAt: null, status: 'active'
+    };
+  }
+  // Index des aliments : actifs par identifiant et par clé (nom et anciens noms) ; « toutes » garde aussi les clés
+  // des aliments retirés, pour qu'un aliment retiré ne revienne pas tout seul depuis le journal.
+  function indexer(idx, m) {
+    if (!m || !m.id || !m.nom) return idx;
+    var cles = [m.nom].concat(m.syn || []).map(cleAliment).filter(Boolean);
+    cles.forEach(function (k) { idx.toutes[k] = m; });
+    if (m.status === 'retire') return idx;
+    idx.byId[m.id] = m; idx.list.push(m);
+    cles.forEach(function (k) { if (!idx.byCle[k]) idx.byCle[k] = m; });
+    return idx;
+  }
+  function persoIndex(list) {
+    if (list && list.byId && list.byCle) return list;
+    var idx = { byId: {}, byCle: {}, toutes: {}, list: [] };
+    (Array.isArray(list) ? list : []).forEach(function (m) { indexer(idx, m); });
+    return idx;
+  }
+  function persoActifs(list) { return persoIndex(list).list; }
+  // Aliment connu pour une ligne : identifiant de la table ou de Mes aliments ; sinon même nom (clé),
+  // Mes aliments d'abord, puis la table. null si l'aliment n'est connu nulle part.
+  function resoudreAliment(ref, nom, perso) {
+    var idx = persoIndex(perso);
+    if (typeof ref === 'string') {
+      // Valeurs données par la personne pour ce même nom (étiquette d'un produit) : elles l'emportent sur la table.
+      if (REF.byId[ref]) return idx.byCle[cleAliment(REF.byId[ref].nom)] ? { type: 'perso', a: idx.byCle[cleAliment(REF.byId[ref].nom)] } : { type: 'ref', a: REF.byId[ref] };
+      if (idx.byId[ref]) return { type: 'perso', a: idx.byId[ref] };
+    }
+    var k = cleAliment(nom);
+    if (!k) return null;
+    if (idx.byCle[k]) return { type: 'perso', a: idx.byCle[k] };
+    if (REF.cle[k]) return { type: 'ref', a: REF.cle[k] };
+    return null;
+  }
+  // Valeurs à reprendre d'un aliment connu : identifiant, source, valeurs pour 100 g, incertitude, familles.
+  function valeursConnues(r) {
+    if (r.type === 'ref') return { ref: r.a.id, src: 'ref', per100: refPer100(r.a), unc: r.a.inc, groups: (r.a.groupes || []).slice() };
+    return { ref: r.a.id, src: r.a.src, per100: clone(r.a.per100), unc: r.a.unc, groups: (r.a.groups || []).slice() };
+  }
+  function memesValeurs(a, b) {
+    return ['kcal', 'p', 'g', 'l', 'f'].every(function (k) {
+      var x = a && a[k], y = b && b[k];
+      return (x == null && y == null) || (x != null && y != null && Math.abs(x - y) < 0.005);
+    });
+  }
+  function joursListe(days) { return (days instanceof Map ? Array.from(days.values()) : (days || [])).slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; }); }
+  // Aliments du journal absents de la table et de Mes aliments : ils y sont ajoutés, une fois par nom.
+  // Valeurs retenues : celles saisies à la main s'il y en a (étiquette), sinon l'estimation la plus fréquente,
+  // à égalité la plus récente. Les autres estimations trouvées sont gardées dans « variantes », pour information.
+  function persoDepuisJournal(days, list, nowIso) {
+    var idx = persoIndex(list), groupes = {}, ordre = [];
+    joursListe(days).forEach(function (d) {
+      (d.entries || []).forEach(function (e) {
+        if (!isActive(e) || (e.src !== 'ia' && e.src !== 'manuel') || !e.per100) return;
+        if (typeof e.ref === 'string' && (REF.byId[e.ref] || idx.byId[e.ref])) return;
+        var k = cleAliment(e.food);
+        if (!k || idx.toutes[k]) return;
+        if (e.src === 'ia' && couvertParLaTable(k)) return; // nom ou autre nom d'un aliment de la table : la table s'applique
+        if (!groupes[k]) { groupes[k] = []; ordre.push(k); }
+        groupes[k].push({ date: d.date, e: e });
+      });
+    });
+    return ordre.map(function (k) {
+      var L = groupes[k], man = L.filter(function (x) { return x.e.src === 'manuel'; }), cand = man.length ? man : L, sig = {}, best = null, kc = {};
+      cand.forEach(function (x) {
+        var s = JSON.stringify(x.e.per100), c = sig[s] || (sig[s] = { n: 0, last: x });
+        c.n++;
+        if ((x.e.createdAt || '') >= (c.last.e.createdAt || '')) c.last = x;
+      });
+      Object.keys(sig).forEach(function (s) {
+        var c = sig[s];
+        if (!best || c.n > best.n || (c.n === best.n && (c.last.e.createdAt || '') > (best.last.e.createdAt || ''))) best = c;
+      });
+      L.forEach(function (x) { var v = r1(x.e.per100.kcal); kc[v] = (kc[v] || 0) + 1; });
+      var variantes = Object.keys(kc).length > 1 ? Object.keys(kc).map(function (v) { return { kcal: Number(v), n: kc[v] }; })
+        .sort(function (a, b) { return b.n - a.n || a.kcal - b.kcal; }) : [];
+      var e = best.last.e;
+      return makePerso({ nom: e.food, per100: e.per100, src: e.src, unc: e.unc, groups: e.groups, mode: 'journal', date: L[0].date, n: L.length, variantes: variantes }, nowIso);
+    });
+  }
+  // Nombre de lignes actives par aliment (table ou Mes aliments), dernière date et quantités saisies.
+  function consoAliments(days, perso) {
+    var idx = persoIndex(perso), out = {};
+    joursListe(days).forEach(function (d) {
+      (d.entries || []).forEach(function (e) {
+        if (!isActive(e)) return;
+        var r = resoudreAliment(e.ref, e.food, idx);
+        if (!r) return;
+        var c = out[r.a.id] || (out[r.a.id] = { n: 0, last: null, grams: {} });
+        c.n++; c.last = d.date;
+        var g = String(e.grams);
+        c.grams[g] = (c.grams[g] || 0) + 1;
+      });
+    });
+    return out;
+  }
+  // Lignes actives d'un aliment dont les valeurs pour 100 g diffèrent des valeurs actuelles de cet aliment.
+  function lignesAAligner(days, cible, perso) {
+    var idx = persoIndex(perso), v = valeursConnues(cible), out = [];
+    joursListe(days).forEach(function (d) {
+      sortEntries(d.entries || []).forEach(function (e) {
+        if (!isActive(e)) return;
+        var r = resoudreAliment(e.ref, e.food, idx);
+        if (!r || r.type !== cible.type || r.a.id !== cible.a.id || memesValeurs(e.per100, v.per100)) return;
+        out.push({ date: d.date, entry: e, apres: computeValues(v.per100, e.grams) });
+      });
+    });
+    return out;
+  }
+  // Ligne reprise avec les valeurs actuelles de l'aliment, sur demande ; l'ancienne valeur reste dans l'historique.
+  function alignerLigne(e, cible, nowIso) {
+    var v = valeursConnues(cible), n = clone(e), c = computeValues(v.per100, e.grams);
+    if (!n.hist) n.hist = [];
+    n.hist.push({ at: nowIso, champ: 'valeurs pour 100 g', de: fmt1(e.per100.kcal) + ' kcal (' + (SRC_LABEL[e.src] || e.src) + ')',
+      a: fmt1(v.per100.kcal) + ' kcal (' + (cible.type === 'ref' ? 'table' : 'Mes aliments') + ' : ' + cible.a.nom + ')' });
+    n.per100 = v.per100; n.src = v.src; n.ref = v.ref; n.unc = v.unc; n.groups = v.groups;
+    n.kcal = c.kcal; n.p = c.p; n.g = c.g; n.l = c.l; n.f = c.f;
+    n.updatedAt = nowIso;
+    return n;
+  }
+  // Fusion de Mes aliments à la restauration : par identifiant, la version modifiée le plus récemment l'emporte ;
+  // un aliment du fichier qui porte le nom d'un aliment déjà présent ici n'est pas ajouté (celui de l'appareil reste).
+  function mergeMesAliments(local, incoming) {
+    var out = (local || []).slice(), byId = {}, cles = {}, st = { added: 0, replaced: 0, kept: 0 };
+    out.forEach(function (m) { byId[m.id] = m; if (m.status !== 'retire') cles[cleAliment(m.nom)] = m.id; });
+    (incoming || []).forEach(function (m) {
+      var cur = byId[m.id], k = cleAliment(m.nom);
+      if (cur) {
+        if (stamp(m) > stamp(cur)) { out[out.indexOf(cur)] = m; byId[m.id] = m; st.replaced++; } else st.kept++;
+        return;
+      }
+      if (m.status !== 'retire' && cles[k]) { st.kept++; return; }
+      out.push(m); byId[m.id] = m;
+      if (m.status !== 'retire') cles[k] = m.id;
+      st.added++;
+    });
+    out.sort(function (a, b) { return a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0; });
+    return { list: out, stats: st };
+  }
+  // Aliment de Mes aliments présenté comme une ligne de la table (liste, recherche, fiche).
+  function persoCommeRef(m) {
+    var syn = (m.syn || []).join(', ');
+    return { id: m.id, nom: m.nom, syn: syn, kcal: m.per100.kcal, p: m.per100.p, g: m.per100.g, l: m.per100.l, f: m.per100.f,
+      portions: [], groupes: (m.groups || []).slice(), src: 'PERSO', inc: m.unc, note: '', perso: m, _n: norm(m.nom), _s: norm(syn) };
+  }
+
+  // Table des aliments consultable : texte (nom et autres noms, accents ignorés), famille, « recettes » ou « mes »
+  // (Mes aliments), puis tri. o.perso : Mes aliments (inclus sauf pour « recettes ») ; o.conso : lignes par aliment.
   function listRef(o) {
     o = o || {};
-    var words = norm(o.q || '').split(' ').filter(Boolean), fam = o.famille || '';
+    var words = norm(o.q || '').split(' ').filter(Boolean), fam = o.famille || '', conso = o.conso || {};
+    var mes = persoActifs(o.perso).map(persoCommeRef);
     var cle = { 'kcal-asc': ['kcal', 1], 'kcal-desc': ['kcal', -1], 'p-desc': ['p', -1], 'f-desc': ['f', -1] }[o.tri];
     var parNom = function (a, b) { return a._n < b._n ? -1 : a._n > b._n ? 1 : 0; };
-    return REF.list.filter(function (a) {
-      if (fam === 'recettes' ? a.src !== 'RECETTE' : fam && (a.groupes || []).indexOf(fam) < 0) return false;
+    var val = function (a, k) { return a[k] == null ? -1 : a[k]; };
+    var nb = function (a) { return (conso[a.id] && conso[a.id].n) || 0; };
+    var base = fam === 'mes' ? mes : fam === 'recettes' ? REF.list : REF.list.concat(mes);
+    return base.filter(function (a) {
+      if (fam === 'recettes' ? a.src !== 'RECETTE' : fam && fam !== 'mes' && (a.groupes || []).indexOf(fam) < 0) return false;
       return words.every(function (w) { return a._n.indexOf(w) >= 0 || a._s.indexOf(w) >= 0; });
-    }).sort(function (a, b) { return (cle ? cle[1] * (a[cle[0]] - b[cle[0]]) : 0) || parNom(a, b); });
+    }).sort(function (a, b) {
+      if (o.tri === 'conso') return nb(b) - nb(a) || parNom(a, b);
+      return (cle ? cle[1] * (val(a, cle[0]) - val(b, cle[0])) : 0) || parNom(a, b);
+    });
   }
   // Part de l'énergie apportée par chaque nutriment (4, 4, 9 et 2 kcal par gramme), en % entiers totalisant 100.
   function energySplit(a) {
@@ -544,11 +763,12 @@ button { cursor: pointer; }
     for (var i = 0; i < reste; i++) out[parts[i][0]]++;
     return out;
   }
-  function searchRef(q, limit) {
+  // Recherche dans la table et dans Mes aliments (perso, facultatif) ; à score égal, Mes aliments d'abord.
+  function searchRef(q, limit, perso) {
     var words = norm(q).split(' ').filter(Boolean);
     if (!words.length) return [];
     var scored = [];
-    REF.list.forEach(function (a) {
+    persoActifs(perso).map(persoCommeRef).concat(REF.list).forEach(function (a) {
       var score = 0;
       for (var i = 0; i < words.length; i++) {
         var w = words[i];
@@ -558,7 +778,7 @@ button { cursor: pointer; }
         else if (a._s.indexOf(w) >= 0) score += 2;
         else return;
       }
-      scored.push([score - a._n.length / 500, a]);
+      scored.push([score + (a.perso ? 0.5 : 0) - a._n.length / 500, a]);
     });
     scored.sort(function (x, y) { return y[0] - x[0]; });
     return scored.slice(0, limit || 8).map(function (x) { return x[1]; });
@@ -920,6 +1140,18 @@ button { cursor: pointer; }
       };
     });
   }
+  // Aliments d'un favori ou d'un repas à reprendre, avec les valeurs actuelles de la table ou de Mes aliments
+  // quand l'aliment y est connu : la reprise donne les mêmes calories qu'une nouvelle saisie du même aliment.
+  function rafraichirItems(items, perso) {
+    var idx = persoIndex(perso);
+    return (items || []).map(function (it) {
+      var r = resoudreAliment(it.ref, it.food, idx);
+      if (!r) return it;
+      var v = valeursConnues(r), n = clone(it);
+      n.ref = v.ref; n.src = v.src; n.per100 = v.per100; n.unc = v.unc; n.groups = v.groups;
+      return n;
+    });
+  }
   function activeFavorites(list) {
     return (list || []).filter(function (f) { return f && f.status !== 'retire'; });
   }
@@ -968,7 +1200,7 @@ button { cursor: pointer; }
       "   b. Donnée en pièces ou en mesures ménagères (deux œufs, un morceau de pain, un bol, une assiette, un verre, un café) : estime les grammes avec la portion de la TABLE si elle existe, sinon avec une portion usuelle réaliste. \"declaree\": false, et explique l'estimation dans \"hypothese\".",
       "   c. Aucune indication de quantité (« du couscous », « j'ai mangé du poulet ») : n'enregistre PAS cet aliment et pose une question courte dans \"precisions\".",
       "3. Valeurs nutritionnelles.",
-      "   a. Si l'aliment correspond à une ligne de la TABLE, mets son identifiant dans \"ref\" et \"pour100\": null.",
+      "   a. Si l'aliment correspond à une ligne de la TABLE ou de MES ALIMENTS, mets son identifiant dans \"ref\" et \"pour100\": null. MES ALIMENTS (envoyé avec chaque message) liste les aliments absents de la table que la personne a déjà saisis, ou dont elle a donné ses propres valeurs : ainsi un même aliment garde toujours les mêmes valeurs.",
       "   b. Sinon \"ref\": null et fournis \"pour100\" : kcal, p (protéines), g (glucides hors fibres), l (lipides), f (fibres, ou null si inconnues), en grammes pour 100 g de l'aliment tel que consommé, mode de cuisson compris, d'après les tables Ciqual ou USDA. Indique \"incertitude\" (faible, moyenne ou élevée) et \"groupes\".",
       "   c. Plat composé : s'il figure dans la TABLE, utilise cette ligne. Si la personne détaille les composants avec leurs quantités (« 200 g de couscous et 150 g de poulet »), enregistre chaque composant séparément.",
       "4. Repas : petit-dejeuner, dejeuner, gouter, diner ou collation. S'il n'est pas précisé, déduis-le de l'heure actuelle (avant 10 h 30 petit-dejeuner, 11 h 30 à 15 h dejeuner, 15 h à 18 h 30 gouter, 18 h 30 à 23 h diner, sinon collation) et mets \"repas_deduit\": true.",
@@ -1007,11 +1239,19 @@ button { cursor: pointer; }
     }
     return lines;
   }
+  // Mes aliments envoyés à Claude : les 150 plus récemment créés ou modifiés.
+  var MES_MAX = 150;
+  function mesAlimentsLines(perso) {
+    return persoActifs(perso).slice().sort(function (a, b) { return stamp(b) < stamp(a) ? -1 : stamp(b) > stamp(a) ? 1 : 0; })
+      .slice(0, MES_MAX).map(function (m) { return m.id + ' | ' + m.nom; });
+  }
   function buildContext(o) {
-    var lines = journalLines(o.days, o.now.date, 3), doc = getDay(o.days, o.now.date);
+    var lines = journalLines(o.days, o.now.date, 3), doc = getDay(o.days, o.now.date), mes = mesAlimentsLines(o.perso);
     return [
       'DATE ET HEURE ACTUELLES (Tunisie) : ' + frDate(o.now.date, 'long') + ' (' + o.now.date + '), ' + o.now.time,
       "PAS DÉJÀ SAISIS AUJOURD'HUI : " + (doc && doc.steps != null ? doc.steps : 'aucun'),
+      'MES ALIMENTS (identifiant | aliment) : aliments hors table déjà saisis par la personne, avec des valeurs fixées',
+      mes.length ? mes.join('\n') : '(aucun)',
       'JOURNAL DES TROIS DERNIERS JOURS (identifiant | date | repas | heure | aliment | quantité)',
       lines.length ? lines.join('\n') : '(aucune ligne)',
       '',
@@ -1019,8 +1259,12 @@ button { cursor: pointer; }
       o.text
     ].join('\n');
   }
+  // ctx : { today, time, entries (journal récent par identifiant), perso (Mes aliments), nowIso }.
+  // Un aliment connu (table ou Mes aliments, par identifiant ou par le même nom) prend les valeurs connues, pas celles
+  // proposées par Claude. Un aliment inconnu prend l'estimation de Claude et entre dans Mes aliments (out.nouveaux).
   function interpret(resp, ctx) {
-    var out = { intent: '', view: null, viewDate: null, message: '', adds: [], steps: null, acts: [], weight: null, asks: [], remarks: [], corrections: [], cancels: [], rejected: [], error: null };
+    var out = { intent: '', view: null, viewDate: null, message: '', adds: [], nouveaux: [], steps: null, acts: [], weight: null, asks: [], remarks: [], corrections: [], cancels: [], rejected: [], error: null };
+    var idx = persoIndex((Array.isArray(ctx.perso) ? ctx.perso : persoActifs(ctx.perso)).slice());
     if (!resp || typeof resp !== 'object' || Array.isArray(resp)) { out.error = 'réponse illisible'; return out; }
     out.intent = str(resp.intention);
     if (out.intent === 'bilan_jour') out.view = 'bilan';
@@ -1043,24 +1287,35 @@ button { cursor: pointer; }
       if (!numOk(grams, 0.1, 5000)) { out.asks.push('Quelle quantité pour « ' + nom + ' » (en grammes ou en portions) ?'); return; }
       var meal = MEAL_LABEL[a.repas] ? a.repas : (topMeal || inferMeal(ctx.time));
       var time = isTime(a.heure) ? a.heure : topTime;
-      var ref = typeof a.ref === 'string' && REF.byId[a.ref] ? REF.byId[a.ref] : null;
-      var per100, src, unc, groups, note = clip(str(a.hypothese), 240);
-      if (ref) {
-        per100 = refPer100(ref); src = 'ref'; unc = ref.inc; groups = ref.groupes.slice();
+      var connu = resoudreAliment(a.ref, nom, idx);
+      var per100, src, unc, groups, refId, note = clip(str(a.hypothese), 240);
+      var ajout = function (t) { note = note ? note + (/[.!?]$/.test(note) ? ' ' : '. ') + t : t; };
+      if (connu) {
+        var v = valeursConnues(connu);
+        per100 = v.per100; src = v.src; unc = v.unc; groups = v.groups; refId = v.ref;
+        if (connu.type === 'perso') ajout('Valeurs pour 100 g reprises de Mes aliments (« ' + connu.a.nom + ' »).');
+        else if (a.ref !== connu.a.id) ajout('Valeurs de la table de référence (« ' + connu.a.nom + ' »).');
       } else {
         var s = sanitizePer100(a.pour100);
         if (!s.ok) { out.rejected.push({ nom: nom, reason: s.reason }); return; }
         per100 = s.per100; src = 'ia';
         unc = UNC.indexOf(a.incertitude) >= 0 ? a.incertitude : 'moyenne';
         groups = (Array.isArray(a.groupes) ? a.groupes : []).filter(function (gk) { return typeof gk === 'string' && REF.groupes[gk]; }).slice(0, 4);
-        if (s.adjusted) note = (note ? note + ' ' : '') + 'Énergie recalculée à partir des macronutriments.';
+        if (s.adjusted) ajout('Énergie recalculée à partir des macronutriments.');
+        // Première saisie de cet aliment : ses valeurs sont gardées pour les saisies suivantes. Un nom que la table
+        // connaît comme autre nom d'un aliment n'y entre pas : la ligne de la table reste la référence.
+        refId = null;
+        if (!couvertParLaTable(cleAliment(nom))) {
+          var m = makePerso({ nom: nom, per100: per100, src: 'ia', unc: unc, groups: groups, date: date }, ctx.nowIso || new Date().toISOString());
+          out.nouveaux.push(m); indexer(idx, m); refId = m.id;
+        }
       }
       out.adds.push({
         date: date, mealInferred: !MEAL_LABEL[a.repas] && inferred,
         data: {
           meal: meal, time: time || (date === ctx.today ? ctx.time : null), tdec: !!time,
           food: nom, qtyText: clip(str(a.quantite), 60), grams: grams, qdec: a.declaree === true,
-          ref: ref ? ref.id : null, src: src, per100: per100, unc: unc, note: note, groups: groups
+          ref: refId, src: src, per100: per100, unc: unc, note: note, groups: groups
         }
       });
     });
@@ -1124,7 +1379,8 @@ button { cursor: pointer; }
       var steps = Number(m[1].replace(/[^\d]/g, ''));
       if (steps >= 0 && steps <= 100000) return { steps: steps, date: /hier/i.test(m[2] || '') ? addDays(today, -1) : today };
     }
-    if (/^(?:(?:affiche|montre|voir|ouvre)\s+)?(?:la\s+)?(?:table|liste)\s+des\s+aliments$|^aliments$/.test(n)) return { view: 'aliments' };
+    if (/^(?:(?:affiche|montre|voir|ouvre)\s+)?(?:la\s+)?(?:table|liste)\s+des\s+aliments$|^aliments$/.test(n)) return { view: 'aliments', famille: '' };
+    if (/^(?:(?:affiche|montre|voir|ouvre)\s+)?mes\s+aliments$/.test(n)) return { view: 'aliments', famille: 'mes' };
     if (/\d\s*(g|kg|ml|cl|l)\b/.test(n)) return null;
     if (!/^(affiche|montre|voir|ouvre|genere|donne|quel est|ou en est|mon|ma|mes|le|la|bilan|rapport|historique)\b/.test(n)) return null;
     if (/\b(ajoute|corrige|supprime|annule|enleve|retire|mange|bu|pris|pese)\b/.test(n)) return null;
@@ -1138,11 +1394,12 @@ button { cursor: pointer; }
   var FORMAT = 'suivi-nutritionnel';
   function countEntries(days) { var n = 0; days.forEach(function (d) { n += (d.entries || []).length; }); return n; }
   // Les favoris retirés restent dans la sauvegarde : une restauration ne doit pas les faire revenir.
-  function buildBackup(days, profile, nowIso, favoris) {
+  // Les aliments retirés de Mes aliments restent aussi dans la sauvegarde, pour la même raison.
+  function buildBackup(days, profile, nowIso, favoris, mesAliments) {
     var list = days.filter(dayHasData).sort(function (a, b) { return a.date < b.date ? -1 : 1; }).map(function (d) {
       return { date: d.date, entries: d.entries || [], steps: d.steps == null ? null : d.steps, stepsAt: d.stepsAt || null, acts: d.acts || [], weight: d.weight == null ? null : d.weight, weightAt: d.weightAt || null };
     });
-    return { format: FORMAT, version: 1, exporteLe: nowIso, fuseau: TZ, lignes: countEntries(list), profil: profile || null, favoris: (favoris || []).slice(), jours: list };
+    return { format: FORMAT, version: 1, exporteLe: nowIso, fuseau: TZ, lignes: countEntries(list), profil: profile || null, favoris: (favoris || []).slice(), mesAliments: (mesAliments || []).slice(), jours: list };
   }
   function sanitizeEntry(raw) {
     if (!raw || typeof raw !== 'object') return null;
@@ -1242,7 +1499,13 @@ button { cursor: pointer; }
       if (!f || seenF[f.id]) { ignored++; return; }
       seenF[f.id] = 1; favoris.push(f);
     });
-    return { ok: true, days: days, lignes: countEntries(days), ignored: ignored, exporteLe: str(doc.exporteLe), profile: sanitizeProfile(doc.profil), favoris: favoris };
+    var mesAliments = [], seenM = {};
+    (Array.isArray(doc.mesAliments) ? doc.mesAliments : []).forEach(function (raw) {
+      var m = sanitizePerso(raw);
+      if (!m || seenM[m.id]) { ignored++; return; }
+      seenM[m.id] = 1; mesAliments.push(m);
+    });
+    return { ok: true, days: days, lignes: countEntries(days), ignored: ignored, exporteLe: str(doc.exporteLe), profile: sanitizeProfile(doc.profil), favoris: favoris, mesAliments: mesAliments };
   }
   function stamp(e) { return e.updatedAt || e.createdAt || ''; }
   function mergeList(existing, incoming) {
@@ -1494,7 +1757,11 @@ button { cursor: pointer; }
     r1: r1, rnd: rnd, rnd2: rnd2, toNum: toNum, numOk: numOk, fmtInt: fmtInt, fmtSigned: fmtSigned, fmt1: fmt1, fmt2: fmt2, fmt2s: fmt2s, fmtPct: fmtPct, clip: clip, clone: clone,
     nowTunis: nowTunis, isDate: isDate, isTime: isTime, addDays: addDays, diffDays: diffDays, weekdayIndex: weekdayIndex,
     weekStart: weekStart, isoWeek: isoWeek, frDate: frDate, frWeek: frWeek, excelSerial: excelSerial, excelTime: excelTime, stampTunis: stampTunis,
-    norm: norm, setRef: setRef, refPer100: refPer100, searchRef: searchRef,
+    norm: norm, setRef: setRef, refPer100: refPer100, searchRef: searchRef, cleAliment: cleAliment,
+    sanitizePerso: sanitizePerso, makePerso: makePerso, persoIndex: persoIndex, persoActifs: persoActifs, resoudreAliment: resoudreAliment,
+    valeursConnues: valeursConnues, memesValeurs: memesValeurs, persoDepuisJournal: persoDepuisJournal, consoAliments: consoAliments,
+    lignesAAligner: lignesAAligner, alignerLigne: alignerLigne, mergeMesAliments: mergeMesAliments, persoCommeRef: persoCommeRef,
+    rafraichirItems: rafraichirItems, mesAlimentsLines: mesAlimentsLines,
     atwater: atwater, sanitizePer100: sanitizePer100, computeValues: computeValues, newId: newId, makeEntry: makeEntry, makeAct: makeAct,
     correctEntry: correctEntry, setStatus: setStatus, isActive: isActive, emptyDay: emptyDay, dayHasData: dayHasData,
     profileState: profileState, bmr: bmr, stepsKm: stepsKm, stepsKcal: stepsKcal, actKcal: actKcal, weightIndex: weightIndex, weightAt: weightAt,
@@ -1801,7 +2068,7 @@ button { cursor: pointer; }
   // ------------------------------------------------------------------ état
   var S = {
     view: 'journal', date: null, today: null, week: null, days: new Map(), wIdx: [],
-    meta: { k: 'meta', schema: 1, createdAt: null, lastBackupAt: null, lastBackupLignes: 0, changes: 0, profile: null, favoris: [] },
+    meta: { k: 'meta', schema: 1, createdAt: null, lastBackupAt: null, lastBackupLignes: 0, changes: 0, profile: null, favoris: [], mesAliments: [] },
     storeKind: 'attente', persist: null, usage: null, loss: null, ready: false,
     thread: [], turns: [], busy: false, ecrit: false, abort: null, caps: { done: false, sample: null, sansJson: false, downloads: null },
     histRange: 'semaine', refQuery: '', selfTest: null, flash: {}, scrollEnd: false, install: null, al: { q: '', famille: '', tri: 'nom' }
@@ -1896,7 +2163,7 @@ button { cursor: pointer; }
     Depot.setSentinel({ lignes: C.countEntries(days), jours: days.filter(C.dayHasData).length, le: new Date().toISOString() });
     clearTimeout(snapTimer);
     snapTimer = setTimeout(function () {
-      var text = JSON.stringify(C.buildBackup(Array.from(S.days.values()), S.meta.profile, new Date().toISOString(), S.meta.favoris));
+      var text = JSON.stringify(C.buildBackup(Array.from(S.days.values()), S.meta.profile, new Date().toISOString(), S.meta.favoris, S.meta.mesAliments));
       if (text.length <= 1800000) Depot.setSnapshot(JSON.parse(text));
     }, 1200);
   }
@@ -1916,17 +2183,38 @@ button { cursor: pointer; }
     });
   }
   function saveMeta() { return enqueue(function () { return Depot.putMeta(S.meta); }); }
-  // Favoris : liste rangée avec les réglages. La liste n'est remplacée en mémoire qu'une fois écrite.
-  function saveFavoris(mutate) {
+  // Favoris et Mes aliments : listes rangées avec les réglages. Une liste n'est remplacée en mémoire qu'une fois écrite.
+  function saveListe(cle, mutate) {
     return enqueue(async function () {
-      var list = C.clone(S.meta.favoris || []), now = new Date().toISOString();
+      var list = C.clone(S.meta[cle] || []), now = new Date().toISOString();
       var res = mutate(list, now);
-      var next = Object.assign({}, S.meta, { favoris: list, changes: (S.meta.changes || 0) + 1 });
+      var patch = { changes: (S.meta.changes || 0) + 1 };
+      patch[cle] = list;
+      var next = Object.assign({}, S.meta, patch);
       await Depot.putMeta(next);
       S.meta = next;
       afterWrite();
       return res;
     });
+  }
+  function saveFavoris(mutate) { return saveListe('favoris', mutate); }
+  function saveMesAliments(mutate) { return saveListe('mesAliments', mutate); }
+  function ajouterMesAliments(liste) {
+    if (!liste || !liste.length) return Promise.resolve([]);
+    return saveMesAliments(function (list) { liste.forEach(function (m) { list.push(m); }); return liste; });
+  }
+  function editMesAliment(id, fn) {
+    return saveMesAliments(function (list, now) {
+      var m = list.find(function (x) { return x.id === id; });
+      if (m) { fn(m, now); m.updatedAt = now; }
+      return m;
+    });
+  }
+  // Aliments du journal absents de la table et de Mes aliments : ajoutés à Mes aliments (au démarrage, après une restauration).
+  async function amorcerMesAliments() {
+    var nouveaux = C.persoDepuisJournal(S.days, S.meta.mesAliments, new Date().toISOString());
+    if (nouveaux.length) await ajouterMesAliments(nouveaux);
+    return nouveaux;
   }
   function addFavori(data) { return saveFavoris(function (list, now) { var f = C.makeFavorite(data, now); list.push(f); return f; }); }
   function editFavori(id, fn) {
@@ -2043,7 +2331,7 @@ button { cursor: pointer; }
     if (fav) { dialogueReprise({ fav: fav, date: S.date }); return; }
     if (!WEB) pushCard({ type: 'moi', text: text });
     var cmd = C.localCommand(text, now.date);
-    if (cmd && cmd.view) { go(cmd.view); return; }
+    if (cmd && cmd.view) { if (cmd.famille != null) S.al.famille = cmd.famille; go(cmd.view); return; }
     if (cmd && cmd.steps != null) {
       await setSteps(cmd.date, cmd.steps, 'total');
       pushCard({ type: 'activite', date: cmd.date, lines: ['Pas enregistrés : ' + C.fmtInt(cmd.steps)] });
@@ -2059,10 +2347,10 @@ button { cursor: pointer; }
       var opts = { cache: false, signal: S.abort.signal, onText: function () { if (S.busy && !S.ecrit) { S.ecrit = true; renderSaisie(); } } };
       if (S.meta.analyse === 'rapide') opts.modelTier = 'quick';
       var input = [{ role: 'user', content: INSTRUCTIONS }].concat(S.turns.slice(-6))
-        .concat([{ role: 'user', content: C.buildContext({ days: S.days, now: now, text: text }) }]);
+        .concat([{ role: 'user', content: C.buildContext({ days: S.days, now: now, text: text, perso: S.meta.mesAliments }) }]);
       var resp = await demanderJson(input, opts);
       S.turns.push({ role: 'user', content: text }, { role: 'assistant', content: JSON.stringify(resp).slice(0, 3000) });
-      await appliquer(C.interpret(resp, { today: now.date, time: now.time, entries: recentEntries(now.date) }));
+      await appliquer(C.interpret(resp, { today: now.date, time: now.time, entries: recentEntries(now.date), perso: S.meta.mesAliments, nowIso: new Date().toISOString() }));
     } catch (e) {
       var code = e && e.code;
       if (code !== 'cancelled') {
@@ -2076,6 +2364,8 @@ button { cursor: pointer; }
   }
   async function appliquer(plan) {
     if (plan.error) { pushCard({ type: 'erreur', text: ERREURS.invalid_json }); return; }
+    // Aliments vus pour la première fois : rangés dans Mes aliments avant les lignes, pour les saisies suivantes.
+    if (plan.nouveaux && plan.nouveaux.length) await ajouterMesAliments(plan.nouveaux);
     var fresh = [], dups = [], lines = [];
     plan.adds.forEach(function (a) {
       var doc = S.days.get(a.date);
@@ -2128,7 +2418,7 @@ button { cursor: pointer; }
   async function exporter(kind) {
     var days = Array.from(S.days.values()), now = C.nowTunis(), data, name, text = null;
     try {
-      if (kind === 'json') { text = JSON.stringify(C.buildBackup(days, S.meta.profile, now.iso, S.meta.favoris)); data = text; name = 'suivi-nutritionnel-sauvegarde-' + now.date + '.json'; }
+      if (kind === 'json') { text = JSON.stringify(C.buildBackup(days, S.meta.profile, now.iso, S.meta.favoris, S.meta.mesAliments)); data = text; name = 'suivi-nutritionnel-sauvegarde-' + now.date + '.json'; }
       else if (kind === 'csv') { text = C.buildCsv(days); data = text; name = 'suivi-nutritionnel-' + now.date + '.csv'; }
       else { data = new Blob([await X.build(C.buildWorkbook(days, S.meta.profile, S.today))]); name = 'suivi-nutritionnel-' + now.date + '.xlsx'; }
     } catch (e) { toast('La préparation du fichier a échoué : ' + ((e && e.message) || 'erreur inconnue')); return false; }
@@ -2175,12 +2465,16 @@ button { cursor: pointer; }
     if (parsed.profile && !C.profileState(S.meta.profile, S.today).ok && !(S.meta.profile && S.meta.profile.majLe)) { S.meta.profile = parsed.profile; profil = true; await saveMeta(); }
     var fav = C.mergeFavoris(S.meta.favoris, parsed.favoris);
     if (fav.stats.added || fav.stats.replaced) await saveFavoris(function (list) { list.length = 0; fav.list.forEach(function (f) { list.push(f); }); });
+    var mes = C.mergeMesAliments(S.meta.mesAliments, parsed.mesAliments);
+    if (mes.stats.added || mes.stats.replaced) await saveMesAliments(function (list) { list.length = 0; mes.list.forEach(function (m) { list.push(m); }); });
+    var amorces = await amorcerMesAliments();
     S.loss = null;
     afterWrite();
-    return { plan: plan, profil: profil, favoris: fav.stats };
+    return { plan: plan, profil: profil, favoris: fav.stats, mesAliments: { added: mes.stats.added + amorces.length, replaced: mes.stats.replaced } };
   }
   function proposerRestauration(parsed, origine) {
     var plan = C.planMerge(S.days, parsed.days), fs = C.mergeFavoris(S.meta.favoris, parsed.favoris).stats, nf = fs.added + fs.replaced;
+    var ms = C.mergeMesAliments(S.meta.mesAliments, parsed.mesAliments).stats, nm = ms.added + ms.replaced;
     var corps = h('div', null,
       h('p', null, origine + ' : ' + parsed.days.length + ' journée' + (parsed.days.length > 1 ? 's' : '') + ', ' + parsed.lignes + ' ligne' + (parsed.lignes > 1 ? 's' : '') + (parsed.exporteLe ? ', du ' + C.stampTunis(parsed.exporteLe) : '') + '.'),
       h('ul', { class: 'puces' },
@@ -2189,16 +2483,17 @@ button { cursor: pointer; }
         h('li', null, plan.kept + ' ligne' + (plan.kept > 1 ? 's' : '') + ' déjà présente' + (plan.kept > 1 ? 's' : '') + ', inchangée' + (plan.kept > 1 ? 's' : '')),
         plan.extras ? h('li', null, plan.extras + ' donnée' + (plan.extras > 1 ? 's' : '') + " d'activité ou de poids à reprendre") : null,
         nf ? h('li', null, nf + ' repas favori' + (nf > 1 ? 's' : '') + ' à ajouter ou à mettre à jour') : null,
+        nm ? h('li', null, nm + ' aliment' + (nm > 1 ? 's' : '') + ' de Mes aliments à ajouter ou à mettre à jour') : null,
         parsed.ignored ? h('li', null, parsed.ignored + ' élément' + (parsed.ignored > 1 ? 's' : '') + ' illisible' + (parsed.ignored > 1 ? 's' : '') + ', ignoré' + (parsed.ignored > 1 ? 's' : '')) : null),
       h('p', { class: 'note' }, 'La restauration ajoute et met à jour. Elle ne supprime aucune ligne du journal actuel.'));
-    if (!plan.writes.length && !nf) { dialogue({ titre: 'Rien à restaurer', corps: corps, actions: [{ label: 'Fermer' }] }); return; }
+    if (!plan.writes.length && !nf && !nm) { dialogue({ titre: 'Rien à restaurer', corps: corps, actions: [{ label: 'Fermer' }] }); return; }
     dialogue({
       titre: 'Restaurer ces données ?', corps: corps,
       actions: [{ label: 'Annuler' }, {
         label: 'Restaurer', kind: 'principal', onClick: async function () {
           var r = await appliquerRestauration(parsed);
-          var nfav = r.favoris.added + r.favoris.replaced;
-          toast('Restauration terminée : ' + r.plan.added + ' ligne' + (r.plan.added > 1 ? 's' : '') + ' ajoutée' + (r.plan.added > 1 ? 's' : '') + (nfav ? ', ' + nfav + ' favori' + (nfav > 1 ? 's' : '') : '') + '.');
+          var nfav = r.favoris.added + r.favoris.replaced, nmes = r.mesAliments.added + r.mesAliments.replaced;
+          toast('Restauration terminée : ' + r.plan.added + ' ligne' + (r.plan.added > 1 ? 's' : '') + ' ajoutée' + (r.plan.added > 1 ? 's' : '') + (nfav ? ', ' + nfav + ' favori' + (nfav > 1 ? 's' : '') : '') + (nmes ? ', ' + nmes + ' aliment' + (nmes > 1 ? 's' : '') + ' dans Mes aliments' : '') + '.');
           render();
         }
       }]
@@ -2224,7 +2519,7 @@ button { cursor: pointer; }
     try { var ok = await Depot.probe(); r.push({ ok: ok, label: 'Écriture puis relecture', detail: ok ? 'réussies à l\'instant' : 'échec' }); }
     catch (e) { r.push({ ok: false, label: 'Écriture puis relecture', detail: 'échec : ' + ((e && e.message) || 'erreur') }); }
     r.push({ ok: S.persist === true, soft: true, label: 'Protection contre le nettoyage automatique', detail: S.persist === true ? 'accordée par le navigateur' : S.persist === false ? 'non accordée : gardez des sauvegardes' : 'inconnue dans cette vue' });
-    r.push({ ok: true, label: 'Contenu du journal', detail: n.filter(C.dayHasData).length + ' journée(s), ' + C.countEntries(n) + ' ligne(s), ' + C.activeFavorites(S.meta.favoris).length + ' repas favori(s)' });
+    r.push({ ok: true, label: 'Contenu du journal', detail: n.filter(C.dayHasData).length + ' journée(s), ' + C.countEntries(n) + ' ligne(s), ' + C.activeFavorites(S.meta.favoris).length + ' repas favori(s), ' + C.persoActifs(S.meta.mesAliments).length + ' aliment(s) dans Mes aliments' });
     await capsReady;
     if (WEB) {
       var sw = navigator.serviceWorker && navigator.serviceWorker.controller;
@@ -2335,7 +2630,11 @@ button { cursor: pointer; }
   function dialogueLigne(date, id) {
     var doc = S.days.get(date), e = doc && doc.entries.find(function (x) { return x.id === id; });
     if (!e) return;
-    var ref = e.ref ? C.REF.byId[e.ref] : null, annulee = e.status === 'annulee';
+    var ref = e.ref ? C.REF.byId[e.ref] : null, annulee = e.status === 'annulee', d = null;
+    var mes = e.ref && !ref ? C.persoIndex(S.meta.mesAliments).byId[e.ref] : null;
+    // Valeurs actuelles du même aliment (table ou Mes aliments), quand elles diffèrent de celles de la ligne.
+    var connu = annulee ? null : C.resoudreAliment(e.ref, e.food, S.meta.mesAliments), vc = connu ? C.valeursConnues(connu) : null;
+    var autre = vc && !C.memesValeurs(e.per100, vc.per100) ? C.computeValues(vc.per100, e.grams) : null;
     var q = h('input', { id: 'l-qte', type: 'number', inputmode: 'decimal', min: '0.1', max: '5000', step: '0.1', value: String(e.grams) });
     var repas = selectRepas('l-repas', e.meal);
     var heure = h('input', { id: 'l-heure', type: 'time', value: e.time || '' });
@@ -2348,9 +2647,19 @@ button { cursor: pointer; }
         h('div', null, h('dt', { text: 'Lipides' }), h('dd', { text: gr(e.l) })),
         h('div', null, h('dt', { text: 'Fibres' }), h('dd', { text: e.f == null ? 'inconnues' : gr(e.f) }))),
       h('p', { class: 'note', text: 'Pour 100 g : ' + kcal(e.per100.kcal) + ', protéines ' + C.fmt1(e.per100.p) + ', glucides ' + C.fmt1(e.per100.g) + ', lipides ' + C.fmt1(e.per100.l) + (e.per100.f == null ? '' : ', fibres ' + C.fmt1(e.per100.f)) + '.' }),
-      h('p', { class: 'note', text: 'Source : ' + (ref ? (C.REF.doc.sources[ref.src] || ref.src) : C.SRC_LABEL[e.src]) + '. Incertitude ' + e.unc + '. Quantité ' + (e.qdec ? 'déclarée' : 'estimée' + (e.qtyText ? ' à partir de « ' + e.qtyText + ' »' : '')) + '.' }),
+      h('p', { class: 'note', text: 'Source : ' + (ref ? (C.REF.doc.sources[ref.src] || ref.src) : C.SRC_LABEL[e.src] + (mes ? ', gardée dans Mes aliments (« ' + mes.nom + ' »)' : '')) + '. Incertitude ' + e.unc + '. Quantité ' + (e.qdec ? 'déclarée' : 'estimée' + (e.qtyText ? ' à partir de « ' + e.qtyText + ' »' : '')) + '.' }),
       e.note ? h('p', { class: 'note', text: 'Hypothèse : ' + e.note }) : null,
       e.orig ? h('p', { class: 'note', text: phrase('Origine : ' + e.orig) }) : null,
+      autre ? h('div', { class: 'aligner', id: 'l-aligner' },
+        h('p', { text: (connu.type === 'ref' ? 'La table de référence' : 'Mes aliments') + ' donne ' + kcal(autre.kcal) + ' pour ' + gr(e.grams) + ' de « ' + connu.a.nom + ' » (' + kcal(vc.per100.kcal) + ' pour 100 g). Cette ligne compte ' + kcal(e.kcal) + '.' }),
+        h('button', { type: 'button', class: 'btn btn-petit', id: 'l-reprendre', onclick: async function () {
+          var now = new Date().toISOString();
+          await updateEntry(date, id, function (x) { return C.memesValeurs(x.per100, vc.per100) ? x : C.alignerLigne(x, connu, now); });
+          S.flash[id] = 1;
+          if (d) d.close();
+          toast('Valeurs reprises. L\'ancienne valeur reste dans les modifications de la ligne.');
+          render();
+        } }, 'Reprendre ces valeurs')) : null,
       annulee ? null : h('div', { class: 'grille-2' }, champ('Quantité (g)', q), champ('Heure', heure)),
       annulee ? null : (ref ? h('div', { class: 'puces-portions' }, ref.portions.map(function (p) {
         return h('button', { type: 'button', class: 'puce', onclick: function () { q.value = String(p.g); } }, p.u + ' = ' + C.fmt1(p.g) + ' g');
@@ -2374,7 +2683,7 @@ button { cursor: pointer; }
         }
       });
     }
-    dialogue({ titre: e.food, corps: corps, actions: actions });
+    d = dialogue({ titre: e.food, corps: corps, actions: actions });
   }
   // o (facultatif) : { recherche, grammes } tirés de la zone de saisie dans la version web.
   function dialogueManuel(o) {
@@ -2400,16 +2709,21 @@ button { cursor: pointer; }
     } }, "L'aliment n'est pas dans la table");
     function choisir(a) {
       choisi = a; clear(liste); rech.value = '';
-      selection.hidden = false; selection.textContent = a.nom + ' : ' + kcal(a.kcal) + ' pour 100 g';
+      selection.hidden = false; selection.textContent = a.nom + (a.perso ? ' (Mes aliments)' : '') + ' : ' + kcal(a.kcal) + ' pour 100 g';
       clear(portions);
       a.portions.forEach(function (p) { portions.appendChild(h('button', { type: 'button', class: 'puce', onclick: function () { q.value = String(p.g); } }, p.u + ' = ' + C.fmt1(p.g) + ' g')); });
+      // Aliment sans portions usuelles (Mes aliments) : les quantités déjà saisies sont proposées.
+      if (!a.portions.length) {
+        var c = C.consoAliments(S.days, S.meta.mesAliments)[a.id], gs = c ? Object.keys(c.grams).sort(function (x, y) { return c.grams[y] - c.grams[x] || Number(x) - Number(y); }).slice(0, 4) : [];
+        gs.forEach(function (g) { portions.appendChild(h('button', { type: 'button', class: 'puce', onclick: function () { q.value = g; } }, C.fmt1(Number(g)) + ' g, déjà saisi')); });
+      }
     }
     function chercher() {
       clear(liste);
-      var res = C.searchRef(rech.value, 7);
+      var res = C.searchRef(rech.value, 7, S.meta.mesAliments);
       res.forEach(function (a) {
-        liste.appendChild(h('button', { type: 'button', class: 'resultat', role: 'option', onclick: function () { choisir(a); } },
-          h('span', { text: a.nom }), h('span', { class: 'chiffre', text: C.fmtInt(a.kcal) + ' kcal/100 g' })));
+        liste.appendChild(h('button', { type: 'button', class: 'resultat', role: 'option', 'data-id': a.id, onclick: function () { choisir(a); } },
+          h('span', null, a.nom, a.perso ? h('span', { class: 'l-sous', text: 'Mes aliments' }) : null), h('span', { class: 'chiffre', text: C.fmtInt(a.kcal) + ' kcal/100 g' })));
       });
       if (!res.length && rech.value.trim()) liste.appendChild(h('p', { class: 'aide', id: 'm-aucun', text: "Aucun aliment de la table ne correspond. Essayez un autre mot, ou touchez « L'aliment n'est pas dans la table »." }));
     }
@@ -2427,16 +2741,19 @@ button { cursor: pointer; }
           var g = C.toNum(q.value), d = date.value;
           if (!C.isDate(d) || d > C.nowTunis().date) { erreurChamp(corps, 'Indiquez une date valide, au plus tard aujourd\'hui.'); return false; }
           if (!C.numOk(g, 0.1, 5000)) { erreurChamp(corps, 'Indiquez une quantité entre 0,1 et 5 000 g.'); return false; }
-          var data;
+          var data, rangement = null;
           if (autre) {
-            var name = nom.value.trim();
+            var name = nom.value.trim().replace(/\s+/g, ' ');
             var sp = C.sanitizePer100({ kcal: vk.value, p: vp.value === '' ? null : vp.value, g: vg.value === '' ? null : vg.value, l: vl.value === '' ? null : vl.value, f: vf.value === '' ? null : vf.value });
-            if (!name) { erreurChamp(corps, "Indiquez le nom de l'aliment."); return false; }
+            if (!name || !C.cleAliment(name)) { erreurChamp(corps, "Indiquez le nom de l'aliment."); return false; }
             if (!sp.ok) { erreurChamp(corps, 'Valeurs pour 100 g incomplètes ou incohérentes : ' + sp.reason + '.'); return false; }
             data = { food: name, ref: null, src: 'manuel', per100: sp.per100, unc: 'moyenne', groups: [], note: sp.adjusted ? 'Énergie recalculée à partir des macronutriments.' : '' };
+            rangement = { nom: name, per100: sp.per100 };
           } else {
             if (!choisi) { erreurChamp(corps, 'Choisissez un aliment dans la liste, ou indiquez qu\'il n\'est pas dans la table.'); return false; }
-            data = { food: choisi.nom, ref: choisi.id, src: 'ref', per100: C.refPer100(choisi), unc: choisi.inc, groups: choisi.groupes.slice(), note: '' };
+            data = choisi.perso
+              ? { food: choisi.perso.nom, ref: choisi.perso.id, src: choisi.perso.src, per100: C.clone(choisi.perso.per100), unc: choisi.perso.unc, groups: choisi.perso.groups.slice(), note: '' }
+              : { food: choisi.nom, ref: choisi.id, src: 'ref', per100: C.refPer100(choisi), unc: choisi.inc, groups: choisi.groupes.slice(), note: '' };
           }
           Object.assign(data, { meal: repas.value, time: C.isTime(heure.value) ? heure.value : null, tdec: C.isTime(heure.value), qtyText: '', grams: g, qdec: true });
           var cur = S.days.get(d);
@@ -2445,8 +2762,28 @@ button { cursor: pointer; }
             erreurChamp(corps, 'Cet aliment est déjà enregistré pour ce repas avec la même quantité. Touchez de nouveau Enregistrer pour l\'ajouter une seconde fois.');
             return false;
           }
+          var remarques = [];
+          // Valeurs saisies à la main : rangées dans Mes aliments (ou mises à jour), pour être reprises ensuite.
+          if (rangement) {
+            var deja = C.persoIndex(S.meta.mesAliments).byCle[C.cleAliment(rangement.nom)];
+            if (deja) {
+              if (!C.memesValeurs(deja.per100, rangement.per100)) {
+                await editMesAliment(deja.id, function (m, t) {
+                  m.hist.push({ at: t, champ: 'valeurs pour 100 g', de: C.fmt1(m.per100.kcal) + ' kcal', a: C.fmt1(rangement.per100.kcal) + ' kcal (saisie manuelle)' });
+                  m.per100 = C.clone(rangement.per100); m.src = 'manuel'; m.unc = 'moyenne'; m.variantes = [];
+                });
+                remarques.push('Valeurs de « ' + deja.nom + ' » mises à jour dans Mes aliments : elles serviront aux prochaines saisies.');
+              }
+              data.ref = deja.id;
+            } else {
+              var mm = C.makePerso({ nom: rangement.nom, per100: rangement.per100, src: 'manuel', unc: 'moyenne', groups: [], date: d }, new Date().toISOString());
+              await ajouterMesAliments([mm]);
+              data.ref = mm.id;
+              remarques.push('« ' + mm.nom + ' » est rangé dans Mes aliments : ses valeurs seront reprises aux prochaines saisies.');
+            }
+          }
           var made = await addEntries([{ date: d, data: data }]);
-          pushCard({ type: 'enregistre', made: made, remarks: [] });
+          pushCard({ type: 'enregistre', made: made, remarks: remarques });
           S.date = d; S.view = 'journal'; render();
         }
       }]
@@ -2570,11 +2907,11 @@ button { cursor: pointer; }
   function dialogueReprise(o) {
     var now = C.nowTunis(), items, orig, titre, meta, mealDef, confirmeDoublon = false;
     if (o.fav) {
-      items = o.fav.items; mealDef = o.fav.meal; titre = o.fav.nom; orig = 'Favori « ' + o.fav.nom + ' »';
+      items = C.rafraichirItems(o.fav.items, S.meta.mesAliments); mealDef = o.fav.meal; titre = o.fav.nom; orig = 'Favori « ' + o.fav.nom + ' »';
       meta = 'Repas favori, rangé avec le ' + C.MEAL_LABEL[o.fav.meal].toLowerCase() + '.';
     } else {
       var src = S.days.get(o.from), quoi = C.MEAL_LABEL[o.meal].toLowerCase() + ' du ' + C.frDate(o.from, 'moyen');
-      items = C.mealItems(src ? src.entries : [], o.meal); mealDef = o.meal;
+      items = C.rafraichirItems(C.mealItems(src ? src.entries : [], o.meal), S.meta.mesAliments); mealDef = o.meal;
       titre = 'Reprendre le ' + quoi; orig = 'Copie du ' + quoi; meta = C.MEAL_LABEL[o.meal] + ' du ' + C.frDate(o.from, 'long') + '.';
     }
     if (!items.length) { toast('Ce repas ne contient aucune ligne active.'); return; }
@@ -2661,7 +2998,7 @@ button { cursor: pointer; }
       favs.forEach(function (f) {
         liste.appendChild(h('div', { class: 'favori' },
           h('div', { class: 'favori-texte' }, h('strong', { text: f.nom }),
-            h('span', { class: 'l-sous', text: C.MEAL_LABEL[f.meal] + ', ' + f.items.length + ' aliment' + (f.items.length > 1 ? 's' : '') + ', ' + kcal(C.itemsTotal(f.items)) + (f.uses ? ', repris ' + f.uses + ' fois' : '') }),
+            h('span', { class: 'l-sous', text: C.MEAL_LABEL[f.meal] + ', ' + f.items.length + ' aliment' + (f.items.length > 1 ? 's' : '') + ', ' + kcal(C.itemsTotal(C.rafraichirItems(f.items, S.meta.mesAliments))) + (f.uses ? ', repris ' + f.uses + ' fois' : '') }),
             h('span', { class: 'favori-liens' },
               h('button', { type: 'button', class: 'lien', onclick: function () { dialogueNomFavori({ fav: f, apres: function () { remplir(); render(); } }); } }, 'Renommer'),
               h('button', { type: 'button', class: 'lien', onclick: function () { confirmerRetrait(f, function () { remplir(); render(); }); } }, 'Retirer'))),
@@ -3183,7 +3520,7 @@ button { cursor: pointer; }
       h('p', { class: 'note', text: "Chaque personne qui l'ouvre a son propre journal, vide au départ, sur son téléphone. " + (C.isDate(d) ? 'Version du ' + C.frDate(d, 'long').replace(/^\S+ /, '') + '. ' : '') + "Une nouvelle version publiée est prise automatiquement à l'ouverture suivante, avec une connexion ; les données restent en place." })]);
   }
   function vueDonnees() {
-    var out = [], days = Array.from(S.days.values()), lignes = C.countEntries(days), jours = days.filter(C.dayHasData).length, p = S.meta.profile || {}, nfav = C.activeFavorites(S.meta.favoris).length;
+    var out = [], days = Array.from(S.days.values()), lignes = C.countEntries(days), jours = days.filter(C.dayHasData).length, p = S.meta.profile || {}, nfav = C.activeFavorites(S.meta.favoris).length, nmes = C.persoActifs(S.meta.mesAliments).length;
     // Profil
     var sexe = h('select', { id: 'pr-sexe' }, h('option', { value: '', selected: !p.sexe }, 'À choisir'), h('option', { value: 'f', selected: p.sexe === 'f' }, 'Femme'), h('option', { value: 'h', selected: p.sexe === 'h' }, 'Homme'));
     var nais = h('input', { id: 'pr-naissance', type: 'number', inputmode: 'numeric', min: '1900', max: String(Number(S.today.slice(0, 4))), step: '1', value: p.naissance ? String(p.naissance) : '', placeholder: 'ex. 1985' });
@@ -3220,7 +3557,7 @@ button { cursor: pointer; }
     var taillOct = S.usage && S.usage.usage ? ' ; environ ' + C.fmt1(S.usage.usage / 1048576) + ' Mo utilisés' : '';
     out.push(section('Où sont mes données', [h('dl', { class: 'fiche' },
       h('div', null, h('dt', { text: 'Emplacement' }), h('dd', { id: 'etat-stockage', text: noms[S.storeKind] + ', sur cet appareil' })),
-      h('div', null, h('dt', { text: 'Contenu' }), h('dd', { id: 'etat-contenu', text: jours + ' journée' + (jours > 1 ? 's' : '') + ', ' + lignes + ' ligne' + (lignes > 1 ? 's' : '') + (nfav ? ', ' + nfav + ' repas favori' + (nfav > 1 ? 's' : '') : '') + taillOct })),
+      h('div', null, h('dt', { text: 'Contenu' }), h('dd', { id: 'etat-contenu', text: jours + ' journée' + (jours > 1 ? 's' : '') + ', ' + lignes + ' ligne' + (lignes > 1 ? 's' : '') + (nfav ? ', ' + nfav + ' repas favori' + (nfav > 1 ? 's' : '') : '') + (nmes ? ', ' + nmes + ' aliment' + (nmes > 1 ? 's' : '') + ' dans Mes aliments' : '') + taillOct })),
       h('div', null, h('dt', { text: 'Protection' }), h('dd', { text: S.persist === true ? 'Le navigateur a accepté de ne pas effacer ces données de lui-même' : 'Non garantie : le système peut effacer ces données si la place manque' })),
       h('div', null, h('dt', { text: 'Dernière sauvegarde en fichier' }), h('dd', { id: 'etat-sauvegarde', text: S.meta.lastBackupAt ? C.stampTunis(S.meta.lastBackupAt) + ' (' + (S.meta.lastBackupLignes || 0) + ' lignes) ; ' + (S.meta.changes || 0) + ' changement(s) depuis' : 'aucune' }))),
       h('p', { class: 'note', text: WEB ? "Le journal n'existe que sur ce téléphone, dans ce navigateur. Effacer les données du site, désinstaller l'application ou changer de téléphone l'efface : gardez un fichier de sauvegarde à jour. Rien n'est envoyé sur Internet." : "Le journal n'existe que sur cet appareil. Vider les données de l'application Claude, la désinstaller ou changer de téléphone l'efface : gardez un fichier de sauvegarde à jour." })]));
@@ -3229,7 +3566,7 @@ button { cursor: pointer; }
       h('button', { type: 'button', class: 'btn', id: 'btn-excel', onclick: function () { exporter('xlsx'); } }, 'Exporter en Excel (.xlsx)'),
       h('button', { type: 'button', class: 'btn', id: 'btn-csv', onclick: function () { exporter('csv'); } }, 'Exporter en CSV'),
       h('button', { type: 'button', class: 'btn', id: 'btn-restaurer', onclick: function () { $('fichier-restauration').click(); } }, 'Restaurer une sauvegarde')),
-      h('p', { class: 'note', text: (WEB ? 'Chaque fichier est téléchargé par le navigateur, dans le dossier Téléchargements du téléphone. ' : 'Chaque fichier est enregistré sur le téléphone après votre confirmation. ') + 'Le classeur Excel contient les feuilles Aliments, Historique quotidien (avec la tendance du poids), Synthèse hebdomadaire, Activités et Profil, avec leurs formules. La sauvegarde (.json) contient aussi vos repas favoris ; la restauration se fait à partir de ce fichier.' })]));
+      h('p', { class: 'note', text: (WEB ? 'Chaque fichier est téléchargé par le navigateur, dans le dossier Téléchargements du téléphone. ' : 'Chaque fichier est enregistré sur le téléphone après votre confirmation. ') + 'Le classeur Excel contient les feuilles Aliments, Historique quotidien (avec la tendance du poids), Synthèse hebdomadaire, Activités et Profil, avec leurs formules. La sauvegarde (.json) contient aussi vos repas favoris et Mes aliments ; la restauration se fait à partir de ce fichier.' })]));
     // Vérification
     var st = S.selfTest;
     out.push(section('Vérifier le fonctionnement', [h('div', { class: 'bloc-actions' }, h('button', { type: 'button', class: 'btn', id: 'btn-test', onclick: autoTest }, st ? 'Relancer la vérification' : 'Lancer la vérification')),
@@ -3243,71 +3580,188 @@ button { cursor: pointer; }
       h('li', { text: 'Digestion : 10 % des apports. Autres activités : (MET − 1) × poids × durée en heures.' }),
       h('li', { text: 'Variation de poids théorique : bilan cumulé divisé par 7 700 kcal par kilogramme, sur les journées où les trois repas principaux sont saisis.' }),
       h('li', { text: 'Tendance du poids : moyenne lissée des pesées. À chaque pesée, la tendance se rapproche de la nouvelle valeur d\'une part égale à 1 − 0,9 puissance le nombre de jours écoulés depuis la pesée précédente (10 % après un jour, 52 % après une semaine).' }),
-      h('li', { text: 'Repas repris ou favoris : les valeurs pour 100 g, la source et le marquage des quantités sont recopiés ; une quantité modifiée au moment de la reprise est enregistrée comme déclarée.' }),
+      h('li', { text: "Même aliment, mêmes valeurs : un aliment absent de la table est rangé dans Mes aliments à sa première saisie, avec ses valeurs pour 100 g ; les saisies suivantes les reprennent." }),
+      h('li', { text: 'Repas repris ou favoris : les quantités et leur marquage sont recopiés ; les valeurs pour 100 g sont celles de la table ou de Mes aliments au moment de la reprise. Une quantité modifiée à la reprise est enregistrée comme déclarée.' }),
+      h('li', { text: "Lignes déjà enregistrées : elles gardent leurs valeurs. Pour les mettre aux valeurs actuelles d'un aliment, touchez « Aligner » dans sa fiche ; l'ancienne valeur reste dans les modifications de la ligne." }),
       h('li', { text: "Table des aliments : consultable dans l'onglet Aliments, avec la source et la fiabilité de chaque valeur." }),
       h('li', { text: "Tout est estimé. L'application ne fixe aucun objectif et ne remplace pas l'avis d'un professionnel de santé." }))));
     return out;
   }
 
   // ------------------------------------------------------- table des aliments
-  var TRIS_AL = [['nom', 'Nom'], ['kcal-asc', 'Moins calorique'], ['kcal-desc', 'Plus calorique'], ['p-desc', 'Plus de protéines'], ['f-desc', 'Plus de fibres']];
+  var TRIS_AL = [['nom', 'Nom'], ['conso', 'Les plus consommés'], ['kcal-asc', 'Moins calorique'], ['kcal-desc', 'Plus calorique'], ['p-desc', 'Plus de protéines'], ['f-desc', 'Plus de fibres']];
   var INC_TEXTE = {
     faible: "Incertitude faible : la valeur varie peu d'un produit à l'autre.",
     moyenne: 'Incertitude moyenne : la composition varie selon le produit ou la préparation.',
     'élevée': 'Incertitude élevée : la recette varie beaucoup, la valeur est un ordre de grandeur.'
   };
-  function ligneAliment(a) {
-    var sous = (a.src === 'RECETTE' ? 'Recette type. ' : '') + 'Prot. ' + C.fmt1(a.p) + ' g, gluc. ' + C.fmt1(a.g) + ' g, lip. ' + C.fmt1(a.l) + ' g, fibres ' + C.fmt1(a.f) + ' g';
-    return h('button', { type: 'button', class: 'aliment', 'data-id': a.id, onclick: function () { dialogueAliment(a); } },
+  var fois = function (n) { return n + ' fois'; };
+  var LIB_SOURCES = {
+    CIQUAL: 'table Ciqual 2013 (ANSES), valeurs relues', CIQUAL2020: 'table Ciqual 2020 (ANSES), valeurs relues', OFF: 'étiquettes de produits (Open Food Facts)',
+    USUEL: 'valeurs usuelles des tables Ciqual et USDA, non relues une à une', RECETTE: "plats estimés à partir d'une recette type, à lire comme des ordres de grandeur"
+  };
+  function ligneAliment(a, c) {
+    var sous = (a.perso ? 'Mes aliments, ' + (a.perso.src === 'manuel' ? 'vos valeurs. ' : 'estimation de Claude. ') : a.src === 'RECETTE' ? 'Recette type. ' : '')
+      + (c && c.n ? 'Saisi ' + fois(c.n) + '. ' : '')
+      + 'Prot. ' + C.fmt1(a.p) + '\u00a0g, gluc. ' + C.fmt1(a.g) + '\u00a0g, lip. ' + C.fmt1(a.l) + '\u00a0g, fibres ' + (a.f == null ? 'inconnues' : C.fmt1(a.f) + '\u00a0g');
+    return h('button', { type: 'button', class: 'aliment' + (a.perso ? ' perso' : ''), 'data-id': a.id, onclick: function () { dialogueAliment(a); } },
       h('span', { class: 'aliment-nom' }, a.nom, h('span', { class: 'l-sous', text: sous })),
       h('span', { class: 'aliment-kcal' }, C.fmtInt(a.kcal), h('span', { class: 'aliment-unite', text: 'kcal' })));
   }
-  function dialogueAliment(a) {
-    var per = C.refPer100(a), sp = C.energySplit(a), por = a.portions || [];
-    var fams = (a.groupes || []).map(function (k) { return C.REF.groupes[k]; }).filter(Boolean);
-    var src = (C.REF.doc && C.REF.doc.sources && C.REF.doc.sources[a.src]) || a.src;
+  function ligneDuJour(x) { return C.frDate(x.date, 'moyen') + ', ' + C.MEAL_LABEL[x.entry.meal].toLowerCase() + ', ' + gr(x.entry.grams); }
+  // Lignes d'un aliment enregistrées avec d'autres valeurs : mises aux valeurs actuelles sur demande, historique gardé.
+  function confirmerAlignement(cible, lignes, apres) {
+    var v = C.valeursConnues(cible), n = lignes.length;
     var corps = h('div', null,
-      h('p', { class: 'dl-meta', text: (fams.length ? fams.join(', ') : 'Sans famille') + (a.src === 'RECETTE' ? '. Plat estimé à partir d\'une recette type.' : '.') }),
+      h('p', { text: (n > 1 ? 'Ces ' + n + ' lignes prendront' : 'Cette ligne prendra') + ' les valeurs de « ' + cible.a.nom + ' » : ' + kcal(v.per100.kcal) + ' pour 100 g.' }),
+      h('ul', { class: 'puces', id: 'al-lignes' }, lignes.map(function (x) { return h('li', { text: ligneDuJour(x) + ' : ' + C.fmtInt(x.entry.kcal) + ' → ' + kcal(x.apres.kcal) }); })),
+      h('p', { class: 'note', text: "L'ancienne valeur reste dans les modifications de chaque ligne. Les totaux des journées concernées sont recalculés." }));
+    dialogue({
+      titre: n > 1 ? 'Aligner ces ' + n + ' lignes ?' : 'Aligner cette ligne ?', corps: corps,
+      actions: [{ label: 'Annuler' }, {
+        label: 'Aligner', kind: 'principal', onClick: async function () {
+          var now = new Date().toISOString(), parJour = {}, fait = 0;
+          lignes.forEach(function (x) { (parJour[x.date] || (parJour[x.date] = [])).push(x.entry.id); });
+          for (var jour of Object.keys(parJour)) {
+            var ids = parJour[jour];
+            await changeDay(jour, function (doc) {
+              doc.entries = doc.entries.map(function (e) {
+                if (ids.indexOf(e.id) < 0 || !C.isActive(e) || C.memesValeurs(e.per100, v.per100)) return e;
+                fait++; S.flash[e.id] = 1;
+                return C.alignerLigne(e, cible, now);
+              });
+            }, ids.length);
+          }
+          toast(fait + ' ligne' + (fait > 1 ? 's alignées' : ' alignée') + ' : ' + (fait > 1 ? 'elles comptent' : 'elle compte') + ' désormais les valeurs de « ' + cible.a.nom + ' ».');
+          render();
+          if (apres) apres();
+        }
+      }]
+    });
+  }
+  function confirmerRetraitAliment(m) {
+    dialogue({
+      titre: 'Retirer de Mes aliments ?', corps: h('p', { text: '« ' + m.nom + " » ne sera plus proposé et ses valeurs ne seront plus reprises. Les lignes déjà enregistrées gardent les leurs. S'il est saisi de nouveau, ses nouvelles valeurs seront gardées à leur tour." }),
+      actions: [{ label: 'Annuler' }, { label: 'Retirer', kind: 'danger', onClick: async function () { await editMesAliment(m.id, function (x) { x.status = 'retire'; }); toast('« ' + m.nom + ' » retiré de Mes aliments.'); render(); } }]
+    });
+  }
+  // Modification d'un aliment de Mes aliments : nom et valeurs pour 100 g (lues sur une étiquette, par exemple).
+  function dialogueModifierAliment(m) {
+    var nom = h('input', { id: 'ma-nom', type: 'text', maxlength: '80', autocomplete: 'off', value: m.nom });
+    var num = function (id, v) { return h('input', { id: id, type: 'number', inputmode: 'decimal', min: '0', step: '0.1', value: v == null ? '' : String(v) }); };
+    var vk = num('ma-kcal', m.per100.kcal), vp = num('ma-p', m.per100.p), vg = num('ma-g', m.per100.g), vl = num('ma-l', m.per100.l), vf = num('ma-f', m.per100.f);
+    var corps = h('div', null, champ("Nom de l'aliment", nom),
+      h('p', { class: 'aide', text: "Valeurs pour 100 g, lues sur l'étiquette ou dans une table. Fibres : laissez vide si elles sont inconnues." }),
+      h('div', { class: 'grille-3' }, champ('kcal', vk), champ('Protéines', vp), champ('Glucides', vg), champ('Lipides', vl), champ('Fibres', vf)),
+      h('p', { class: 'note', text: "Les prochaines saisies de cet aliment prendront ces valeurs. Les lignes déjà enregistrées ne changent pas : sa fiche permet ensuite de les aligner." }));
+    dialogue({
+      titre: 'Modifier « ' + m.nom + ' »', corps: corps,
+      actions: [{ label: 'Retirer', kind: 'danger', onClick: function () { confirmerRetraitAliment(m); } }, { label: 'Fermer' }, {
+        label: 'Enregistrer', kind: 'principal', onClick: async function () {
+          var name = nom.value.trim().replace(/\s+/g, ' ');
+          var sp = C.sanitizePer100({ kcal: vk.value, p: vp.value === '' ? null : vp.value, g: vg.value === '' ? null : vg.value, l: vl.value === '' ? null : vl.value, f: vf.value === '' ? null : vf.value });
+          if (!name || !C.cleAliment(name)) { erreurChamp(corps, "Indiquez le nom de l'aliment."); return false; }
+          if (!sp.ok) { erreurChamp(corps, 'Valeurs pour 100 g incomplètes ou incohérentes : ' + sp.reason + '.'); return false; }
+          var autre = C.persoIndex(S.meta.mesAliments).byCle[C.cleAliment(name)];
+          if (autre && autre.id !== m.id) { erreurChamp(corps, 'Un autre aliment de Mes aliments porte déjà ce nom : « ' + autre.nom + ' ».'); return false; }
+          var changeV = !C.memesValeurs(m.per100, sp.per100), changeN = name !== m.nom;
+          if (!changeV && !changeN) return;
+          var maj = await editMesAliment(m.id, function (x, t) {
+            if (changeN) {
+              x.hist.push({ at: t, champ: 'nom', de: x.nom, a: name });
+              // L'ancien nom reste reconnu : les lignes déjà saisies sous ce nom restent rattachées à l'aliment.
+              if ((x.syn || []).indexOf(x.nom) < 0) x.syn = (x.syn || []).concat([x.nom]).slice(-8);
+              x.nom = C.clip(name, 80);
+            }
+            if (changeV) {
+              x.hist.push({ at: t, champ: 'valeurs pour 100 g', de: C.fmt1(x.per100.kcal) + ' kcal', a: C.fmt1(sp.per100.kcal) + ' kcal' });
+              x.per100 = sp.per100; x.src = 'manuel'; x.variantes = [];
+            }
+          });
+          toast(changeV ? 'Valeurs enregistrées : elles serviront aux prochaines saisies.' : 'Nom enregistré.');
+          render();
+          if (maj) dialogueAliment(C.persoCommeRef(maj));
+        }
+      }]
+    });
+  }
+  function dialogueAliment(a0) {
+    var m = a0.perso ? C.persoIndex(S.meta.mesAliments).byId[a0.perso.id] : null;
+    if (a0.perso && !m) return;
+    var a = m ? C.persoCommeRef(m) : a0, cible = m ? { type: 'perso', a: m } : { type: 'ref', a: a }, d = null;
+    var per = C.refPer100(a), sp = C.energySplit({ p: a.p, g: a.g, l: a.l, f: a.f || 0 }), por = a.portions || [];
+    var fams = (a.groupes || []).map(function (k) { return C.REF.groupes[k]; }).filter(Boolean);
+    var c = C.consoAliments(S.days, S.meta.mesAliments)[a.id], aligner = C.lignesAAligner(S.days, cible, S.meta.mesAliments);
+    var gs = c ? Object.keys(c.grams).sort(function (x, y) { return c.grams[y] - c.grams[x] || Number(x) - Number(y); }).slice(0, 4) : [];
+    var source;
+    if (m) {
+      var depuis = m.origine.date ? ' le ' + C.frDate(m.origine.date, 'long').replace(/^\S+ /, '') : '';
+      source = [m.src === 'manuel' ? 'Valeurs saisies par vous (étiquette ou table).'
+        : m.origine.mode === 'journal' ? 'Estimation de Claude, reprise de votre journal (première saisie' + depuis + ').'
+        : 'Estimation de Claude, faite à la première saisie' + depuis + '.',
+        'Les saisies suivantes reprennent ces valeurs : même quantité, mêmes calories.'];
+      if (m.variantes && m.variantes.length) source.push('Votre journal contenait ' + m.variantes.length + ' estimations différentes : ' + m.variantes.map(function (v) { return C.fmt1(v.kcal) + ' kcal (' + fois(v.n) + ')'; }).join(', ') + ' pour 100 g. Valeur gardée : la plus fréquente, à égalité la plus récente.');
+    } else source = [phrase((C.REF.doc && C.REF.doc.sources && C.REF.doc.sources[a.src]) || a.src)];
+    var corps = h('div', null,
+      h('p', { class: 'dl-meta', text: (m ? 'Mes aliments. ' : '') + (fams.length ? fams.join(', ') : 'Sans famille') + (a.src === 'RECETTE' ? '. Plat estimé à partir d\'une recette type.' : '.') }),
       h('h3', { class: 'sous-titre', text: 'Valeurs pour 100 g' }),
       tableau(['Nutriment', 'Pour 100 g'], [
         { cells: ['Énergie (kcal)', C.fmtInt(a.kcal)] }, { cells: ['Protéines (g)', C.fmt1(a.p)] }, { cells: ['Glucides hors fibres (g)', C.fmt1(a.g)] },
-        { cells: ['Lipides (g)', C.fmt1(a.l)] }, { cells: ['Fibres (g)', C.fmt1(a.f)] }], 'etroit'),
-      sp ? h('p', { class: 'note', id: 'al-energie', text: "Part de l'énergie : protéines " + sp.p + ' %, glucides ' + sp.g + ' %, lipides ' + sp.l + ' %, fibres ' + sp.f + ' % (4, 4, 9 et 2 kcal par gramme).' }) : null,
+        { cells: ['Lipides (g)', C.fmt1(a.l)] }, { cells: ['Fibres (g)', a.f == null ? 'inconnues' : C.fmt1(a.f)] }], 'etroit'),
+      sp ? h('p', { class: 'note', id: 'al-energie', text: "Part de l'énergie : protéines " + sp.p + ' %, glucides ' + sp.g + ' %, lipides ' + sp.l + ' %' + (a.f == null ? ' (fibres inconnues)' : ', fibres ' + sp.f + ' %') + ' (4, 4, 9 et 2 kcal par gramme).' }) : null,
       por.length ? h('h3', { class: 'sous-titre', text: 'Portions usuelles' }) : null,
       por.length ? tableau(['Portion', 'Poids (g)', 'kcal'], por.map(function (p) { return { cells: [p.u, C.fmt1(p.g), C.fmtInt(C.computeValues(per, p.g).kcal)] }; }), 'etroit') : null,
       por.length ? h('p', { class: 'note', text: 'Poids usuels estimés ; calories calculées à partir des valeurs pour 100 g.' }) : null,
+      c || aligner.length ? h('h3', { class: 'sous-titre', text: 'Vos saisies' }) : null,
+      c ? h('p', { id: 'al-saisies', text: 'Saisi ' + fois(c.n) + ', la dernière fois le ' + C.frDate(c.last, 'long').replace(/^\S+ /, '') + '.' }) : null,
+      gs.length ? h('p', { class: 'note', id: 'al-quantites', text: 'Avec les valeurs actuelles : ' + gs.map(function (g) { return C.fmt1(Number(g)) + ' g = ' + kcal(C.computeValues(per, Number(g)).kcal); }).join(' ; ') + '.' }) : null,
+      aligner.length ? h('div', { class: 'aligner', id: 'al-aligner' },
+        h('p', { text: aligner.length + (aligner.length > 1 ? ' lignes de votre journal ont' : ' ligne de votre journal a') + ' d\'autres valeurs pour cet aliment :' }),
+        h('ul', { class: 'puces' }, aligner.slice(0, 4).map(function (x) { return h('li', { text: ligneDuJour(x) + ' : ' + kcal(x.entry.kcal) + ' (ici ' + C.fmtInt(x.apres.kcal) + ')' }); }),
+          aligner.length > 4 ? h('li', { text: 'et ' + (aligner.length - 4) + ' autre' + (aligner.length > 5 ? 's' : '') + '.' }) : null),
+        h('button', { type: 'button', class: 'btn btn-petit', id: 'al-aligner-btn', onclick: function () { if (d) d.close(); confirmerAlignement(cible, aligner, function () { dialogueAliment(a); }); } }, aligner.length > 1 ? 'Aligner ces lignes' : 'Aligner cette ligne')) : null,
       h('h3', { class: 'sous-titre', text: 'Source et fiabilité' }),
-      h('p', { id: 'al-source', text: src + '.' }),
+      h('p', { id: 'al-source', text: source.join(' ') }),
       h('p', { text: INC_TEXTE[a.inc] || '' }),
       a.note ? h('p', { class: 'note', text: 'Hypothèse : ' + a.note }) : null,
-      a.syn ? h('p', { class: 'note', text: 'Autres noms reconnus : ' + a.syn + '.' }) : null);
-    dialogue({ titre: a.nom, corps: corps, focusTitre: true, actions: [{ label: 'Fermer' }, { label: 'Ajouter au journal', kind: 'principal', onClick: function () { dialogueManuel({ aliment: a }); } }] });
+      a.syn ? h('p', { class: 'note', text: 'Autres noms reconnus : ' + a.syn + '.' }) : null,
+      m && m.hist && m.hist.length ? h('details', { class: 'historique-ligne' }, h('summary', { text: 'Modifications (' + m.hist.length + ')' }),
+        h('ul', { class: 'puces' }, m.hist.map(function (x) { return h('li', { text: C.stampTunis(x.at) + ' : ' + x.champ + ', ' + x.de + ' → ' + x.a }); }))) : null);
+    var actions = [{ label: 'Fermer' }];
+    if (m) actions.push({ label: 'Modifier', onClick: function () { dialogueModifierAliment(m); } });
+    actions.push({ label: 'Ajouter au journal', kind: 'principal', onClick: function () { dialogueManuel({ aliment: a }); } });
+    d = dialogue({ titre: a.nom, corps: corps, focusTitre: true, actions: actions });
   }
   function vueAliments() {
-    var fams = [['', 'Toutes'], ['recettes', 'Plats et recettes types']].concat(Object.keys(C.REF.groupes).map(function (k) { return [k, C.REF.groupes[k]]; }));
+    var mes = C.persoActifs(S.meta.mesAliments), conso = C.consoAliments(S.days, S.meta.mesAliments);
+    var fams = [['', 'Toutes'], ['mes', 'Mes aliments (' + mes.length + ')'], ['recettes', 'Plats et recettes types']].concat(Object.keys(C.REF.groupes).map(function (k) { return [k, C.REF.groupes[k]]; }));
     var rq = h('input', { id: 'al-rech', type: 'search', placeholder: 'Par exemple : pain, khobz, kafteji', value: S.al.q, autocomplete: 'off' });
     var fam = h('select', { id: 'al-famille' }, fams.map(function (f) { return h('option', { value: f[0], selected: S.al.famille === f[0] }, f[1]); }));
     var tri = h('select', { id: 'al-tri' }, TRIS_AL.map(function (t) { return h('option', { value: t[0], selected: S.al.tri === t[0] }, t[1]); }));
     var compte = h('p', { class: 'note', id: 'al-compte', 'aria-live': 'polite' }), liste = h('div', { class: 'aliments', id: 'al-liste' });
     function remplir() {
-      var res = C.listRef({ q: S.al.q, famille: S.al.famille, tri: S.al.tri });
-      compte.textContent = res.length + ' aliment' + (res.length > 1 ? 's' : '') + ' sur ' + C.REF.list.length + '. Calories pour 100 g ; touchez un aliment pour le détail.';
+      var res = C.listRef({ q: S.al.q, famille: S.al.famille, tri: S.al.tri, perso: S.meta.mesAliments, conso: conso }), total = C.REF.list.length + mes.length;
+      compte.textContent = res.length + ' aliment' + (res.length > 1 ? 's' : '') + ' sur ' + total + '. Calories pour 100 g ; touchez un aliment pour le détail.';
       clear(liste);
-      if (!res.length) liste.appendChild(h('p', { class: 'vide', text: 'Aucun aliment ne correspond. Essayez un autre mot ou une autre famille.' }));
-      res.forEach(function (a) { liste.appendChild(ligneAliment(a)); });
+      if (!res.length) liste.appendChild(h('p', { class: 'vide', text: S.al.famille === 'mes' && !mes.length
+        ? "Aucun aliment pour l'instant. Un aliment absent de la table y est rangé à sa première saisie, avec ses valeurs pour 100 g."
+        : 'Aucun aliment ne correspond. Essayez un autre mot ou une autre famille.' }));
+      res.forEach(function (a) { liste.appendChild(ligneAliment(a, conso[a.id])); });
     }
     rq.addEventListener('input', function () { S.al.q = rq.value; remplir(); });
     fam.addEventListener('change', function () { S.al.famille = fam.value; remplir(); });
     tri.addEventListener('change', function () { S.al.tri = tri.value; remplir(); });
     remplir();
-    var nb = { CIQUAL: 0, USUEL: 0, RECETTE: 0 }, conv = (C.REF.doc && C.REF.doc.convention) || '';
+    var nb = {}, conv = (C.REF.doc && C.REF.doc.convention) || '';
     C.REF.list.forEach(function (a) { nb[a.src] = (nb[a.src] || 0) + 1; });
+    var parSource = Object.keys(LIB_SOURCES).filter(function (k) { return nb[k]; }).map(function (k) { return LIB_SOURCES[k] + ' (' + nb[k] + ')'; });
     return [
       section(null, [champ('Rechercher', rq), h('div', { class: 'grille-2' }, champ('Famille', fam), champ('Trier par', tri)), compte, liste]),
       section('À propos de ces valeurs', h('ul', { class: 'puces' },
         conv ? h('li', { text: conv.replace(/ x /g, ' × ') }) : null,
-        h('li', { text: nb.CIQUAL + ' valeurs relues dans la table Ciqual 2013 (ANSES) ; ' + nb.USUEL + ' valeurs usuelles des tables Ciqual et USDA, non relues une à une ; ' + nb.RECETTE + ' plats estimés à partir d\'une recette type, à lire comme des ordres de grandeur.' }),
-        h('li', { text: "Un aliment absent de la table se saisit avec vos propres valeurs : Saisie manuelle, puis « L'aliment n'est pas dans la table »." + (WEB ? '' : ' Vous pouvez aussi le décrire dans la zone de saisie : Claude estimera ses valeurs.') })))
+        h('li', { id: 'al-sources', text: 'Sources de la table : ' + parSource.join(' ; ') + '.' }),
+        h('li', { text: 'Mes aliments : un aliment absent de la table y est rangé à sa première saisie, avec ses valeurs pour 100 g (' + (WEB ? 'celles que vous saisissez' : 'estimées par Claude, ou celles que vous saisissez') + '). Les saisies suivantes reprennent ces valeurs : même aliment, même quantité, mêmes calories. Sa fiche permet de corriger ces valeurs.' }),
+        h('li', { text: "Un aliment absent de la table se saisit aussi avec vos propres valeurs : Saisie manuelle, puis « L'aliment n'est pas dans la table »." })))
     ];
   }
 
@@ -3338,7 +3792,7 @@ button { cursor: pointer; }
         h('div', { class: 'nav-titre' }, h('h1', { text: S.week === C.weekStart(S.today) ? 'Cette semaine' : 'Semaine ' + iw.week }), h('p', { text: cap(C.frWeek(S.week)) })),
         navBtn('Semaine suivante', '›', S.week >= C.weekStart(S.today), function () { S.week = C.addDays(S.week, 7); render(); })));
     } else {
-      var tt = { historique: ['Historique', 'Journées saisies, de la plus récente à la plus ancienne'], aliments: ['Aliments', 'Table de référence : ' + C.REF.list.length + ' aliments, valeurs pour 100 g'], donnees: ['Données et réglages', 'Profil, fichiers, vérifications'] }[S.view] || ['', ''];
+      var tt = { historique: ['Historique', 'Journées saisies, de la plus récente à la plus ancienne'], aliments: ['Aliments', 'Table de référence : ' + C.REF.list.length + ' aliments' + (function (n) { return n ? ', et ' + n + ' dans Mes aliments' : ''; })(C.persoActifs(S.meta.mesAliments).length) + '. Valeurs pour 100 g'], donnees: ['Données et réglages', 'Profil, fichiers, vérifications'] }[S.view] || ['', ''];
       e.appendChild(h('div', { class: 'nav seul' }, h('div', { class: 'nav-titre' }, h('h1', { text: tt[0] }), h('p', { text: tt[1] }))));
     }
   }
@@ -3439,11 +3893,14 @@ button { cursor: pointer; }
       var meta = await Depot.readMeta();
       if (meta) S.meta = Object.assign(S.meta, meta);
       if (!Array.isArray(S.meta.favoris)) S.meta.favoris = [];
+      if (!Array.isArray(S.meta.mesAliments)) S.meta.mesAliments = [];
       if (!S.meta.createdAt) { S.meta.createdAt = now.iso; await Depot.putMeta(S.meta); }
     } catch (e) {
       S.storeKind = 'memoire';
     }
     S.wIdx = C.weightIndex(S.days);
+    // Aliments déjà saisis hors table (y compris avant cette version) : rangés dans Mes aliments.
+    try { await amorcerMesAliments(); } catch (e) { /* le journal reste utilisable ; nouvel essai au prochain démarrage */ }
     var lignes = C.countEntries(Array.from(S.days.values())), temoin = Depot.sentinel();
     if (!lignes && !Array.from(S.days.values()).some(C.dayHasData) && temoin && temoin.lignes > 0) {
       var snap = Depot.snapshot();
