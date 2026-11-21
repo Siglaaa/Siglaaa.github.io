@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <script>
 window.NUTRI_MODE = 'web';
-window.NUTRI_VERSION = '2026-11-18-7ec7e7ef';
+window.NUTRI_VERSION = '2026-11-21-fec04276';
 if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -169,6 +169,7 @@ button { cursor: pointer; }
 .act-ligne { display: grid; grid-template-columns: minmax(64px, 1.2fr) minmax(64px, 1fr) minmax(52px, 0.9fr) 52px auto; align-items: baseline; gap: 6px; padding: 5px 0; border-bottom: 1px solid var(--trait); }
 .act-nom { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
 .act-val { font-variant-numeric: tabular-nums; }
+.act-val-large { grid-column: span 2; }
 .act-det { font-size: 12.5px; color: var(--encre-3); }
 .act-ligne .lien { padding: 4px 0; justify-self: end; }
 
@@ -283,6 +284,12 @@ button { cursor: pointer; }
 .aliment-kcal { font-size: 17px; font-weight: 700; font-stretch: 75%; font-variant-numeric: tabular-nums; text-align: right; line-height: 1.1; }
 .aliment-unite { display: block; font-size: 11.5px; font-weight: 500; font-stretch: 100%; color: var(--encre-3); }
 .dialogue-corps .sous-titre { margin-top: 16px; font-size: 14px; font-weight: 700; color: var(--encre); }
+/* Corpulence : un indicateur par ligne, valeur alignée à droite, repère en dessous du nom. */
+.indics { margin-top: 2px; }
+.indic { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--trait); }
+.indic-nom { font-weight: 600; min-width: 0; }
+.indic-nom .l-sous { font-weight: 400; margin-top: 2px; }
+.indic-val { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* Annotation en marge du registre : lignes enregistrées avec d'autres valeurs que celles de l'aliment. */
 .aligner { margin-top: 12px; padding: 8px 10px; border-left: 4px solid var(--bleu); background: var(--bleu-pale); font-size: 13.5px; }
 .aligner .puces { margin: 6px 0 8px; }
@@ -859,10 +866,89 @@ button { cursor: pointer; }
   function makeAct(x, nowIso) {
     return { id: x.id || newId('a'), label: clip(x.label, 60), min: rnd(x.min), met: r1(x.met), createdAt: nowIso, updatedAt: null, status: 'active' };
   }
-  function emptyDay(date) { return { date: date, entries: [], steps: null, stepsAt: null, acts: [], weight: null, weightAt: null, updatedAt: null }; }
+  function emptyDay(date) { return { date: date, entries: [], steps: null, stepsAt: null, acts: [], weight: null, weightAt: null, waist: null, waistAt: null, hip: null, hipAt: null, updatedAt: null }; }
   function dayHasData(d) {
-    return !!d && ((d.entries && d.entries.length > 0) || d.steps != null || (d.acts && d.acts.length > 0) || d.weight != null);
+    return !!d && ((d.entries && d.entries.length > 0) || d.steps != null || (d.acts && d.acts.length > 0) || d.weight != null || d.waist != null || d.hip != null);
   }
+
+  // --------------------------------------------- mensurations et indicateurs de corpulence
+  // Tour de taille et tour de hanches en centimètres, une valeur par jour (comme la pesée).
+  // Repères : OMS (classes d'IMC ; tour de taille et rapport taille/hanches, consultation d'experts de 2008, mêmes
+  // seuils de tour de taille que la Fédération internationale du diabète pour la Méditerranée et le Moyen-Orient),
+  // NICE 2022 (rapport tour de taille/taille), commission du Lancet 2025 (lecture d'ensemble), Woolcott et Bergman 2018
+  // (masse grasse estimée, RFM). Ce sont des repères pour l'adulte, pas un diagnostic.
+  var MESURE_LIM = { taille: [40, 250], hanches: [50, 250] };
+  var CORPULENCE = {
+    imc: [[18.5, 'Insuffisance pondérale'], [25, 'Corpulence normale'], [30, 'Surpoids'], [35, 'Obésité, classe I'], [40, 'Obésité, classe II'], [Infinity, 'Obésité, classe III']],
+    taille: { h: [94, 102], f: [80, 88] },
+    rtt: [0.4, 0.5, 0.6],
+    rth: { h: 0.9, f: 0.85 },
+    lancet: { taille: { h: 102, f: 88 }, rtt: 0.5, imc: 30, imcTresHaut: 40 }
+  };
+  var NIVEAU_TAILLE = ['Pas de risque accru', 'Risque accru', 'Risque nettement accru'];
+  var NIVEAU_RTT = { '-1': 'Sous 0,4', 0: 'Pas de risque accru', 1: 'Risque accru', 2: 'Risque encore plus élevé' };
+  var LECTURE_COURTE = {
+    imc40: 'IMC supérieur à 40 : excès de masse grasse admis sans autre mesure',
+    deux: 'Au moins deux indicateurs au-dessus du seuil : excès de masse grasse',
+    'imc-un': 'IMC de 30 ou plus et un indicateur au-dessus du seuil : excès de masse grasse',
+    'sans-imc': "Sans IMC : moins de deux indicateurs au-dessus du seuil, critères non réunis",
+    'imc-non': 'IMC de 30 ou plus, aucun indicateur au-dessus du seuil : excès non confirmé',
+    non: "Critères d'excès de masse grasse non réunis"
+  };
+  // Arrondi décimal, comme ARRONDI d'Excel (0,535 donne 0,54).
+  function arrondi(x, n) { return (x < 0 ? -1 : 1) * Number(Math.round(Number(Math.abs(x) + 'e' + n)) + 'e-' + n); }
+  function mesureOk(v, quoi) { return numOk(v, MESURE_LIM[quoi][0], MESURE_LIM[quoi][1]); }
+  function mesuresIndex(days) {
+    var arr = [];
+    eachDay(days, function (d) {
+      if (!d) return;
+      var w = mesureOk(d.waist, 'taille') ? d.waist : null, hp = mesureOk(d.hip, 'hanches') ? d.hip : null;
+      if (w != null || hp != null) arr.push({ date: d.date, waist: w, hip: hp });
+    });
+    arr.sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    return arr;
+  }
+  // Dernière mesure du tour de taille au plus tard à cette date, avec le tour de hanches du même jour s'il existe.
+  function mesureAt(index, date) {
+    var hit = null;
+    for (var i = 0; i < (index || []).length && index[i].date <= date; i++) if (index[i].waist != null) hit = index[i];
+    return hit;
+  }
+  // Poids retenu pour l'IMC : la tendance du poids à cette date, sinon le poids du profil.
+  function poidsImc(series, profile, date) {
+    var t = trendAt(series, date);
+    if (t) return { kg: t.trend, source: 'tendance', date: t.date };
+    if (profile && numOk(profile.poids, 30, 300)) return { kg: profile.poids, source: 'profil', date: null };
+    return null;
+  }
+  function classeImc(v) { for (var i = 0; i < CORPULENCE.imc.length; i++) if (v < CORPULENCE.imc[i][0]) return CORPULENCE.imc[i][1]; return null; }
+  // Indicateurs à une date, à partir du profil (sexe, année de naissance, taille), du poids et des mesures.
+  // Mêmes calculs, mêmes arrondis et mêmes seuils que la feuille Mesures du classeur.
+  function indicateurs(profile, date, kg, waist, hip) {
+    var ps = profileState(profile, date), out = { ok: ps.ok, reason: ps.reason, age: ps.age, kg: numOk(kg, 30, 300) ? kg : null,
+      imc: null, classeImc: null, taille: null, niveauTaille: null, rtt: null, niveauRtt: null, rth: null, rthEleve: null, rfm: null, criteres: [], nLancet: null, lecture: null };
+    if (!ps.ok) return out;
+    var cm = profile.taille, sexe = profile.sexe, L = CORPULENCE.lancet;
+    if (out.kg != null) { out.imc = arrondi(out.kg / ((cm / 100) * (cm / 100)), 1); out.classeImc = classeImc(out.imc); }
+    if (mesureOk(waist, 'taille')) {
+      var sw = CORPULENCE.taille[sexe];
+      out.taille = waist;
+      out.niveauTaille = waist >= sw[1] ? 2 : waist >= sw[0] ? 1 : 0;
+      out.rtt = arrondi(waist / cm, 2);
+      out.niveauRtt = out.rtt >= CORPULENCE.rtt[2] ? 2 : out.rtt >= CORPULENCE.rtt[1] ? 1 : out.rtt >= CORPULENCE.rtt[0] ? 0 : -1;
+      out.rfm = arrondi(64 - 20 * cm / waist + (sexe === 'f' ? 12 : 0), 1);
+      if (mesureOk(hip, 'hanches')) { out.rth = arrondi(waist / hip, 2); out.rthEleve = out.rth >= CORPULENCE.rth[sexe]; }
+      // Commission du Lancet (2025) : excès de masse grasse si IMC très élevé, ou deux indicateurs au-dessus du seuil,
+      // ou IMC d'obésité et un indicateur. Seuils retenus par la commission pour l'adulte d'origine européenne.
+      out.criteres = [{ nom: 'tour de taille', eleve: waist >= L.taille[sexe] }, { nom: 'tour de taille / taille', eleve: out.rtt >= L.rtt }];
+      if (out.rth != null) out.criteres.push({ nom: 'tour de taille / tour de hanches', eleve: out.rthEleve });
+      out.nLancet = out.criteres.filter(function (c) { return c.eleve; }).length;
+      out.lecture = out.imc != null && out.imc > L.imcTresHaut ? 'imc40' : out.nLancet >= 2 ? 'deux' : out.imc == null ? 'sans-imc'
+        : out.imc >= L.imc ? (out.nLancet >= 1 ? 'imc-un' : 'imc-non') : 'non';
+    }
+    return out;
+  }
+  function lectureEstExces(code) { return code === 'imc40' || code === 'deux' || code === 'imc-un'; }
 
   // ------------------------------------------------------ dépense énergétique
   function profileState(p, date) {
@@ -1210,7 +1296,7 @@ button { cursor: pointer; }
       "8. Demandes d'affichage : \"intention\" vaut bilan_jour, bilan_semaine ou historique, sans rien enregistrer.",
       "9. Pas : si la personne donne un nombre de pas, \"pas\": {\"nombre\": 8500, \"mode\": \"total\"} quand c'est le total du jour (il remplace la valeur précédente) ou \"mode\": \"ajout\" quand ce sont des pas en plus. Sinon \"pas\": null.",
       "10. Autres activités (sport, vélo, natation, ménage) : ajoute à \"activites\" un objet {\"nom\", \"minutes\", \"met\"}, où met est l'intensité du Compendium des activités physiques (ordres de grandeur : marche rapide 4,3 ; vélo tranquille 4 ; vélo soutenu 8 ; course 9,8 ; natation 5,8 ; football 7 ; musculation 3,5 ; ménage 3,3). Sans durée, pose la question dans \"precisions\". Une marche déjà comptée en pas ne se saisit pas une seconde fois comme activité : signale-le dans \"remarques\".",
-      "11. Poids : si la personne indique son poids (« je pèse 78,4 kg »), \"poids\": {\"kg\": 78.4}. Sinon null.",
+      "11. Poids et mensurations : si la personne indique son poids (« je pèse 78,4 kg »), \"poids\": {\"kg\": 78.4}, sinon null. Si elle indique son tour de taille ou son tour de hanches en centimètres (« tour de taille 92 cm », « hanches 104 »), \"mesures\": {\"tour_taille\": 92, \"tour_hanches\": null}, sinon null. N'invente jamais une mesure qui n'est pas donnée.",
       "12. Question générale : \"intention\": \"question\" et réponse brève et factuelle dans \"message\". Ne fixe jamais d'objectif de calories ou de poids, ne propose pas de rythme de perte, n'encourage pas la restriction, ne juge ni les quantités ni le poids, ne donne pas d'avis médical.",
       "13. \"message\" : une phrase courte en français, sans chiffre de calories (l'application les affiche).",
       "",
@@ -1220,9 +1306,9 @@ button { cursor: pointer; }
       "FORMAT DE LA RÉPONSE (toutes les clés sont obligatoires)",
       '{"intention":"ajouter|corriger|activite|bilan_jour|bilan_semaine|historique|question|autre","date":"AAAA-MM-JJ","repas":"petit-dejeuner|dejeuner|gouter|diner|collation","repas_deduit":false,"heure":null,',
       '"aliments":[{"nom":"Œuf dur","ref":"oeuf_dur","quantite":"2 œufs","grammes":100,"declaree":false,"hypothese":"1 œuf = 50 g sans coquille","pour100":null,"groupes":[],"incertitude":"faible"}],',
-      '"pas":null,"activites":[],"poids":null,',
+      '"pas":null,"activites":[],"poids":null,"mesures":null,',
       '"precisions":[],"corrections":[{"id":"identifiant","grammes":50}],"annulations":[],"remarques":[],"message":"Petit-déjeuner enregistré."}',
-      "Un aliment, \"pas\", une activité ou \"poids\" peuvent porter leur propre clé \"date\" ; un aliment peut aussi porter \"repas\" et \"heure\" si le message couvre plusieurs repas. \"corrections\" accepte aussi \"repas\" et \"heure\". Laisse les listes vides quand elles ne servent pas.",
+      "Un aliment, \"pas\", une activité, \"poids\" ou \"mesures\" peuvent porter leur propre clé \"date\" ; un aliment peut aussi porter \"repas\" et \"heure\" si le message couvre plusieurs repas. \"corrections\" accepte aussi \"repas\" et \"heure\". Laisse les listes vides quand elles ne servent pas.",
       "",
       "TABLE DE RÉFÉRENCE (identifiant | aliment (autres noms) | portions usuelles)",
       refLines()
@@ -1263,7 +1349,7 @@ button { cursor: pointer; }
   // Un aliment connu (table ou Mes aliments, par identifiant ou par le même nom) prend les valeurs connues, pas celles
   // proposées par Claude. Un aliment inconnu prend l'estimation de Claude et entre dans Mes aliments (out.nouveaux).
   function interpret(resp, ctx) {
-    var out = { intent: '', view: null, viewDate: null, message: '', adds: [], nouveaux: [], steps: null, acts: [], weight: null, asks: [], remarks: [], corrections: [], cancels: [], rejected: [], error: null };
+    var out = { intent: '', view: null, viewDate: null, message: '', adds: [], nouveaux: [], steps: null, acts: [], weight: null, mesures: null, asks: [], remarks: [], corrections: [], cancels: [], rejected: [], error: null };
     var idx = persoIndex((Array.isArray(ctx.perso) ? ctx.perso : persoActifs(ctx.perso)).slice());
     if (!resp || typeof resp !== 'object' || Array.isArray(resp)) { out.error = 'réponse illisible'; return out; }
     out.intent = str(resp.intention);
@@ -1340,6 +1426,13 @@ button { cursor: pointer; }
       else if (wd > ctx.today) out.rejected.push({ nom: 'poids', reason: 'date dans le futur' });
       else out.weight = { date: wd, kg: r1(kg) };
     }
+    if (resp.mesures && typeof resp.mesures === 'object') {
+      var tw = resp.mesures.tour_taille == null ? null : toNum(resp.mesures.tour_taille), th = resp.mesures.tour_hanches == null ? null : toNum(resp.mesures.tour_hanches), md = dateOf(resp.mesures);
+      if (tw == null && th == null) { /* rien à enregistrer */ }
+      else if ((tw != null && !mesureOk(tw, 'taille')) || (th != null && !mesureOk(th, 'hanches'))) out.rejected.push({ nom: 'mensurations', reason: 'tour de taille ou de hanches absent ou hors limites (en centimètres)' });
+      else if (md > ctx.today) out.rejected.push({ nom: 'mensurations', reason: 'date dans le futur' });
+      else out.mesures = { date: md, waist: tw == null ? null : r1(tw), hip: th == null ? null : r1(th) };
+    }
     (Array.isArray(resp.precisions) ? resp.precisions : []).slice(0, 5).forEach(function (q) { q = clip(str(q), 240); if (q) out.asks.push(q); });
     (Array.isArray(resp.remarques) ? resp.remarques : []).slice(0, 5).forEach(function (q) { q = clip(str(q), 240); if (q) out.remarks.push(q); });
     var known = ctx.entries || {};
@@ -1370,6 +1463,23 @@ button { cursor: pointer; }
     rech = rech.replace(/^(?:(?:de la|du|des|de|un|une|le|la|les)\s+|(?:de l|d|l)['’]\s*)+/i, '').trim().slice(0, 60);
     return { recherche: rech, grammes: numOk(g, 0.1, 5000) ? g : null };
   }
+  // Message réduit à des mensurations : { mesures: { waist, hip }, date } ; { erreur } si une valeur est hors limites ;
+  // null si le message contient autre chose (il suit alors le chemin habituel).
+  function mesuresDuTexte(raw, today) {
+    var t = String(raw || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, ' ').replace(/\s+/g, ' ').trim();
+    var nb = '(\\d{2,3}(?:[.,]\\d)?)';
+    var mw = new RegExp('(?:^|\\s)(?:mon\\s+)?tour\\s+(?:de\\s+)?taille\\s*:?\\s*(?:de\\s+|=\\s*)?' + nb + '\\s*(?:cm)?(?=[\\s,;.]|$)').exec(t);
+    var mh = new RegExp('(?:^|\\s)(?:mon\\s+|mes\\s+)?(?:tour\\s+(?:de\\s+|des\\s+)?)?hanches?\\s*:?\\s*(?:de\\s+|=\\s*)?' + nb + '\\s*(?:cm)?(?=[\\s,;.]|$)').exec(t);
+    if (!mw && !mh) return null;
+    var reste = t;
+    [mw, mh].forEach(function (m) { if (m) reste = reste.replace(m[0], ' '); });
+    var hier = /\bhier\b/.test(reste);
+    if (reste.replace(/\b(et|hier|aujourd hui|ce matin|cm)\b/g, ' ').replace(/[,;.:]/g, ' ').trim()) return null;
+    var w = mw ? toNum(mw[1]) : null, hp = mh ? toNum(mh[1]) : null;
+    if ((w != null && !mesureOk(w, 'taille')) || (hp != null && !mesureOk(hp, 'hanches')))
+      return { erreur: 'Mesure non enregistrée : indiquez le tour de taille entre ' + MESURE_LIM.taille[0] + ' et ' + MESURE_LIM.taille[1] + ' cm, le tour de hanches entre ' + MESURE_LIM.hanches[0] + ' et ' + MESURE_LIM.hanches[1] + ' cm.' };
+    return { mesures: { waist: w == null ? null : r1(w), hip: hp == null ? null : r1(hp) }, date: hier ? addDays(today, -1) : today };
+  }
   function localCommand(text, today) {
     var raw = String(text || '').trim(), n = norm(raw);
     if (!n || n.length > 70) return null;
@@ -1379,6 +1489,8 @@ button { cursor: pointer; }
       var steps = Number(m[1].replace(/[^\d]/g, ''));
       if (steps >= 0 && steps <= 100000) return { steps: steps, date: /hier/i.test(m[2] || '') ? addDays(today, -1) : today };
     }
+    var mes = mesuresDuTexte(raw, today);
+    if (mes) return mes;
     if (/^(?:(?:affiche|montre|voir|ouvre)\s+)?(?:la\s+)?(?:table|liste)\s+des\s+aliments$|^aliments$/.test(n)) return { view: 'aliments', famille: '' };
     if (/^(?:(?:affiche|montre|voir|ouvre)\s+)?mes\s+aliments$/.test(n)) return { view: 'aliments', famille: 'mes' };
     if (/\d\s*(g|kg|ml|cl|l)\b/.test(n)) return null;
@@ -1397,7 +1509,8 @@ button { cursor: pointer; }
   // Les aliments retirés de Mes aliments restent aussi dans la sauvegarde, pour la même raison.
   function buildBackup(days, profile, nowIso, favoris, mesAliments) {
     var list = days.filter(dayHasData).sort(function (a, b) { return a.date < b.date ? -1 : 1; }).map(function (d) {
-      return { date: d.date, entries: d.entries || [], steps: d.steps == null ? null : d.steps, stepsAt: d.stepsAt || null, acts: d.acts || [], weight: d.weight == null ? null : d.weight, weightAt: d.weightAt || null };
+      return { date: d.date, entries: d.entries || [], steps: d.steps == null ? null : d.steps, stepsAt: d.stepsAt || null, acts: d.acts || [], weight: d.weight == null ? null : d.weight, weightAt: d.weightAt || null,
+        waist: d.waist == null ? null : d.waist, waistAt: d.waistAt || null, hip: d.hip == null ? null : d.hip, hipAt: d.hipAt || null };
     });
     return { format: FORMAT, version: 1, exporteLe: nowIso, fuseau: TZ, lignes: countEntries(list), profil: profile || null, favoris: (favoris || []).slice(), mesAliments: (mesAliments || []).slice(), jours: list };
   }
@@ -1491,6 +1604,8 @@ button { cursor: pointer; }
       });
       if (numOk(toNum(j.steps), 0, 200000)) { d.steps = rnd(toNum(j.steps)); d.stepsAt = str(j.stepsAt) || null; }
       if (numOk(toNum(j.weight), 30, 300)) { d.weight = r1(toNum(j.weight)); d.weightAt = str(j.weightAt) || null; }
+      if (mesureOk(toNum(j.waist), 'taille')) { d.waist = r1(toNum(j.waist)); d.waistAt = str(j.waistAt) || null; }
+      if (mesureOk(toNum(j.hip), 'hanches')) { d.hip = r1(toNum(j.hip)); d.hipAt = str(j.hipAt) || null; }
       if (dayHasData(d)) days.push(d);
     });
     var favoris = [], seenF = {};
@@ -1530,6 +1645,8 @@ button { cursor: pointer; }
       if (ma.stats.added || ma.stats.replaced) { next.acts = ma.list; touched = true; plan.extras += ma.stats.added + ma.stats.replaced; }
       if (j.steps != null && (cur.steps == null || (j.stepsAt || '') > (cur.stepsAt || ''))) { if (cur.steps !== j.steps) { next.steps = j.steps; next.stepsAt = j.stepsAt; touched = true; plan.extras++; } }
       if (j.weight != null && (cur.weight == null || (j.weightAt || '') > (cur.weightAt || ''))) { if (cur.weight !== j.weight) { next.weight = j.weight; next.weightAt = j.weightAt; touched = true; plan.extras++; } }
+      if (j.waist != null && (cur.waist == null || (j.waistAt || '') > (cur.waistAt || ''))) { if (cur.waist !== j.waist) { next.waist = j.waist; next.waistAt = j.waistAt; touched = true; plan.extras++; } }
+      if (j.hip != null && (cur.hip == null || (j.hipAt || '') > (cur.hipAt || ''))) { if (cur.hip !== j.hip) { next.hip = j.hip; next.hipAt = j.hipAt; touched = true; plan.extras++; } }
       if (touched) plan.writes.push(next);
     });
     return plan;
@@ -1587,7 +1704,7 @@ button { cursor: pointer; }
     var s2 = [['Date', 'Calories (kcal)', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Fibres (g)', 'Repas enregistrés', 'Aliments enregistrés']
       .concat(MEALS.map(function (m) { return m.label + ' (kcal)'; }))
       .concat(['Pas', 'Distance (km)', 'Poids utilisé (kg)', 'Métabolisme de base (kcal)', 'Digestion (kcal)', 'Marche (kcal)', 'Autres activités (kcal)',
-        'Dépense totale (kcal)', 'Bilan (kcal)', 'Pesée du jour (kg)', 'Tendance du poids (kg)', 'Date de la dernière pesée', 'État de la saisie']).map(H)];
+        'Dépense totale (kcal)', 'Bilan (kcal)', 'Pesée du jour (kg)', 'Tendance du poids (kg)', 'Date de la dernière pesée', 'État de la saisie', 'IMC (tendance du poids)']).map(H)];
     var dayRows = [];
     if (first) {
       for (var d = first, i = 0; d <= last; d = addDays(d, 1), i++) {
@@ -1617,6 +1734,9 @@ button { cursor: pointer; }
         row.push({ f: r === 2 ? 'IF($W2<>"",$W2,"")' : 'IF($W' + r + '="",$X' + p0 + ',IF($X' + p0 + '="",$W' + r + ',ROUND($X' + p0 + '+(1-' + P + '$B$10^($A' + r + '-$Y' + p0 + '))*($W' + r + '-$X' + p0 + '),2)))', v: tw ? tw.trend : '', s: 'n2' });
         row.push({ f: r === 2 ? 'IF($W2<>"",$A2,"")' : 'IF($W' + r + '<>"",$A' + r + ',$Y' + p0 + ')', v: tw ? excelSerial(tw.date) : '', s: 'd' });
         row.push({ v: statusText(st, t.n) });
+        // IMC : tendance du poids (sinon poids de départ du profil) divisée par le carré de la taille.
+        var pj = poidsImc(tSerie, profile, d), ij = indicateurs(profile, d, pj ? pj.kg : null, null, null), T2 = '((' + P + '$B$4/100)*(' + P + '$B$4/100))';
+        row.push({ f: 'IF(OR(' + P + '$B$2="",' + P + '$B$3="",' + P + '$B$4=""),"",IF(OR(YEAR($A' + r + ')-' + P + '$B$3<18,YEAR($A' + r + ')-' + P + '$B$3>100),"",IF($X' + r + '="",IF(' + P + '$B$5="","",ROUND(' + P + '$B$5/' + T2 + ',1)),ROUND($X' + r + '/' + T2 + ',1))))', v: ij.imc == null ? '' : ij.imc, s: 'n1' });
         s2.push(row);
         dayRows.push({ date: d, tot: t, status: st, energy: en });
       }
@@ -1672,6 +1792,32 @@ button { cursor: pointer; }
       });
     });
 
+    // 4 bis. Mesures : une ligne par jour de mesure ; indicateurs calculés par formules (mêmes seuils que l'application).
+    var s8 = [['Date', 'Tour de taille (cm)', 'Tour de hanches (cm)', 'Âge (ans)', 'Repères applicables', 'Poids, tendance (kg)', 'IMC', "Classe de l'IMC (OMS)",
+      'Repère du tour de taille (OMS)', 'Tour de taille / taille', 'Repère tour de taille / taille (NICE)', 'Tour de taille / tour de hanches', 'Repère taille / hanches (OMS)',
+      'Masse grasse estimée (RFM, %)', 'Indicateurs au-dessus du seuil (commission du Lancet)', "Lecture d'ensemble (commission du Lancet, 2025)"].map(H)];
+    mesuresIndex(all).forEach(function (mm, k) {
+      var r8 = k + 2, R = function (c) { return '$' + c + r8; }, sx = P + '$B$2', tl = P + '$B$4';
+      var pm = poidsImc(tSerie, profile, mm.date), im = indicateurs(profile, mm.date, pm ? pm.kg : null, mm.waist, mm.hip);
+      var age = profile && numOk(profile.naissance, 1900, 2100) ? Number(mm.date.slice(0, 4)) - profile.naissance : '';
+      var look = 'INDEX(' + Q + '$X:$X,MATCH(' + R('A') + ',' + Q + '$A:$A,0))', depart = 'IF(' + P + '$B$5="","",' + P + '$B$5)';
+      var E = function (v) { return v == null ? '' : v; };
+      s8.push([{ v: excelSerial(mm.date), s: 'd' }, mm.waist == null ? null : { v: mm.waist, s: 'n1' }, mm.hip == null ? null : { v: mm.hip, s: 'n1' },
+        { f: 'IF(' + P + '$B$3="","",YEAR(' + R('A') + ')-' + P + '$B$3)', v: age, s: 'i' },
+        { f: 'IF(OR(' + sx + '="",' + tl + '="",' + R('D') + '=""),"Non",IF(OR(' + R('D') + '<18,' + R('D') + '>100),"Non","Oui"))', v: im.ok ? 'Oui' : 'Non' },
+        { f: 'IFERROR(IF(' + look + '="",' + depart + ',' + look + '),' + depart + ')', v: pm ? pm.kg : '', s: 'n2' },
+        { f: 'IF(OR(' + R('E') + '<>"Oui",' + R('F') + '=""),"",ROUND(' + R('F') + '/((' + tl + '/100)*(' + tl + '/100)),1))', v: E(im.imc), s: 'n1' },
+        { f: 'IF(' + R('G') + '="","",' + CORPULENCE.imc.slice(0, -1).map(function (b) { return 'IF(' + R('G') + '<' + b[0] + ',"' + b[1] + '",'; }).join('') + '"' + CORPULENCE.imc[CORPULENCE.imc.length - 1][1] + '"' + ')'.repeat(CORPULENCE.imc.length - 1) + ')', v: E(im.classeImc) },
+        { f: 'IF(OR(' + R('E') + '<>"Oui",' + R('B') + '=""),"",IF(' + R('B') + '>=IF(' + sx + '="Homme",' + CORPULENCE.taille.h[1] + ',' + CORPULENCE.taille.f[1] + '),"' + NIVEAU_TAILLE[2] + '",IF(' + R('B') + '>=IF(' + sx + '="Homme",' + CORPULENCE.taille.h[0] + ',' + CORPULENCE.taille.f[0] + '),"' + NIVEAU_TAILLE[1] + '","' + NIVEAU_TAILLE[0] + '")))', v: im.niveauTaille == null ? '' : NIVEAU_TAILLE[im.niveauTaille] },
+        { f: 'IF(OR(' + R('E') + '<>"Oui",' + R('B') + '=""),"",ROUND(' + R('B') + '/' + tl + ',2))', v: E(im.rtt), s: 'n2' },
+        { f: 'IF(' + R('J') + '="","",IF(' + R('J') + '>=' + CORPULENCE.rtt[2] + ',"' + NIVEAU_RTT[2] + '",IF(' + R('J') + '>=' + CORPULENCE.rtt[1] + ',"' + NIVEAU_RTT[1] + '",IF(' + R('J') + '>=' + CORPULENCE.rtt[0] + ',"' + NIVEAU_RTT[0] + '","' + NIVEAU_RTT[-1] + '"))))', v: im.niveauRtt == null ? '' : NIVEAU_RTT[im.niveauRtt] },
+        { f: 'IF(OR(' + R('E') + '<>"Oui",' + R('B') + '="",' + R('C') + '=""),"",ROUND(' + R('B') + '/' + R('C') + ',2))', v: E(im.rth), s: 'n2' },
+        { f: 'IF(' + R('L') + '="","",IF(' + R('L') + '>=IF(' + sx + '="Homme",' + CORPULENCE.rth.h + ',' + CORPULENCE.rth.f + '),"Au-dessus du seuil","Sous le seuil"))', v: im.rth == null ? '' : im.rthEleve ? 'Au-dessus du seuil' : 'Sous le seuil' },
+        { f: 'IF(OR(' + R('E') + '<>"Oui",' + R('B') + '=""),"",ROUND(64-20*' + tl + '/' + R('B') + '+IF(' + sx + '="Femme",12,0),1))', v: E(im.rfm), s: 'n1' },
+        { f: 'IF(OR(' + R('E') + '<>"Oui",' + R('B') + '=""),"",(' + R('B') + '>=IF(' + sx + '="Homme",' + CORPULENCE.lancet.taille.h + ',' + CORPULENCE.lancet.taille.f + '))+(' + R('J') + '>=' + CORPULENCE.lancet.rtt + ')+IF(' + R('L') + '="",0,(' + R('L') + '>=IF(' + sx + '="Homme",' + CORPULENCE.rth.h + ',' + CORPULENCE.rth.f + '))*1))', v: E(im.nLancet), s: 'i' },
+        { f: 'IF(' + R('O') + '="","",IF(AND(' + R('G') + '<>"",' + R('G') + '>' + CORPULENCE.lancet.imcTresHaut + '),"' + LECTURE_COURTE.imc40 + '",IF(' + R('O') + '>=2,"' + LECTURE_COURTE.deux + '",IF(' + R('G') + '="","' + LECTURE_COURTE['sans-imc'] + '",IF(' + R('G') + '>=' + CORPULENCE.lancet.imc + ',IF(' + R('O') + '>=1,"' + LECTURE_COURTE['imc-un'] + '","' + LECTURE_COURTE['imc-non'] + '"),"' + LECTURE_COURTE.non + '")))))', v: im.lecture ? LECTURE_COURTE[im.lecture] : '', s: 'w' }]);
+    });
+
     // 5. Profil et paramètres du modèle (les formules s'y réfèrent).
     var pr = profile || {};
     var s5 = [[H('Paramètre'), H('Valeur'), H('Remarque')],
@@ -1684,7 +1830,13 @@ button { cursor: pointer; }
       [{ v: 'Digestion (part des apports)' }, { v: ENERGIE.digestion, s: 'g' }, { v: 'Effet thermique des aliments, environ 10 %', s: 'w' }],
       [{ v: 'kcal par kg de poids' }, { v: ENERGIE.kcalParKg, s: 'g' }, { v: 'Convention usuelle pour la variation théorique', s: 'w' }],
       [{ v: 'Tendance du poids : part gardée chaque jour' }, { v: TENDANCE.lissage, s: 'g' }, { v: 'Moyenne lissée des pesées : tendance + (1 - 0,9 ^ jours écoulés) x (pesée - tendance)', s: 'w' }],
-      [{ v: 'Métabolisme de base' }, { v: 'Mifflin-St Jeor' }, { v: '10 x poids + 6,25 x taille - 5 x âge + 5 (homme) ou - 161 (femme)', s: 'w' }]];
+      [{ v: 'Métabolisme de base' }, { v: 'Mifflin-St Jeor' }, { v: '10 x poids + 6,25 x taille - 5 x âge + 5 (homme) ou - 161 (femme)', s: 'w' }],
+      [{ v: 'IMC' }, { v: 'Poids / taille²' }, { v: "Classes de l'OMS : 18,5 ; 25 ; 30 ; 35 ; 40. Poids : tendance du poids, sinon poids de départ", s: 'w' }],
+      [{ v: 'Tour de taille' }, { v: 'OMS' }, { v: 'Risque accru à partir de 94 cm (homme) ou 80 cm (femme), nettement accru à partir de 102 ou 88 cm', s: 'w' }],
+      [{ v: 'Tour de taille / taille' }, { v: 'NICE' }, { v: '0,4 à 0,49 : pas de risque accru ; 0,5 à 0,59 : risque accru ; 0,6 ou plus : risque encore plus élevé', s: 'w' }],
+      [{ v: 'Tour de taille / tour de hanches' }, { v: 'OMS' }, { v: 'Risque métabolique accru à partir de 0,90 (homme) ou 0,85 (femme)', s: 'w' }],
+      [{ v: 'Masse grasse estimée' }, { v: 'RFM' }, { v: '64 - 20 x taille / tour de taille, + 12 pour une femme (Woolcott et Bergman, 2018)', s: 'w' }],
+      [{ v: "Lecture d'ensemble" }, { v: 'Commission du Lancet, 2025' }, { v: "Excès de masse grasse si IMC > 40, ou deux indicateurs au-dessus du seuil, ou IMC de 30 ou plus et un indicateur. Seuils : tour de taille 102 cm (homme) ou 88 cm (femme) ; tour de taille / taille 0,5 ; taille / hanches 0,90 ou 0,85", s: 'w' }]];
 
     // 6. Table de référence.
     var s6 = [['Aliment', 'Calories (kcal/100 g)', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Fibres (g)', 'Portions usuelles', 'Source', 'Incertitude', 'Remarque', 'Identifiant'].map(H)];
@@ -1705,9 +1857,10 @@ button { cursor: pointer; }
 
     var sheets = [
       { name: 'Aliments', widths: [12, 8, 15, 30, 12, 14, 13, 12, 11, 10, 18, 16, 20, 12, 44, 18, 20, 34], rows: s1, freeze: true, filter: true },
-      { name: 'Historique quotidien', widths: [12, 13, 12, 12, 11, 10, 11, 11, 14, 12, 11, 11, 12, 9, 11, 11, 13, 11, 11, 13, 13, 11, 11, 13, 13, 40], rows: s2, freeze: true },
+      { name: 'Historique quotidien', widths: [12, 13, 12, 12, 11, 10, 11, 11, 14, 12, 11, 11, 12, 9, 11, 11, 13, 11, 11, 13, 13, 11, 11, 13, 13, 40, 12], rows: s2, freeze: true },
       { name: 'Synthèse hebdomadaire', widths: [11, 12, 12, 13, 11, 16, 13, 13, 13, 12, 13, 9, 13, 9, 14, 12, 11, 11, 12, 14, 14, 16, 16, 11, 16, 60], rows: s3, freeze: true },
       { name: 'Activités', widths: [12, 32, 12, 14, 14, 16, 18, 22], rows: s4, freeze: true },
+      { name: 'Mesures', widths: [12, 12, 12, 9, 11, 13, 8, 20, 22, 12, 24, 14, 20, 14, 18, 62], rows: s8, freeze: true },
       { name: 'Profil', widths: [44, 18, 60], rows: s5, freeze: true },
       { name: 'Table de référence', widths: [42, 12, 11, 11, 10, 10, 46, 34, 12, 50, 20], rows: s6, freeze: true },
       { name: 'Modifications', widths: [13, 30, 18, 18, 18, 22, 13, 18], rows: s7, freeze: true }
@@ -1766,6 +1919,9 @@ button { cursor: pointer; }
     correctEntry: correctEntry, setStatus: setStatus, isActive: isActive, emptyDay: emptyDay, dayHasData: dayHasData,
     profileState: profileState, bmr: bmr, stepsKm: stepsKm, stepsKcal: stepsKcal, actKcal: actKcal, weightIndex: weightIndex, weightAt: weightAt,
     TENDANCE: TENDANCE, weightTrend: weightTrend, trendAt: trendAt, weightComparison: weightComparison,
+    MESURE_LIM: MESURE_LIM, CORPULENCE: CORPULENCE, NIVEAU_TAILLE: NIVEAU_TAILLE, NIVEAU_RTT: NIVEAU_RTT, LECTURE_COURTE: LECTURE_COURTE,
+    arrondi: arrondi, mesureOk: mesureOk, mesuresIndex: mesuresIndex, mesureAt: mesureAt, poidsImc: poidsImc, classeImc: classeImc,
+    indicateurs: indicateurs, lectureEstExces: lectureEstExces, mesuresDuTexte: mesuresDuTexte,
     dayEnergy: dayEnergy, countsForBalance: countsForBalance,
     totals: totals, shares: shares, dayStatus: dayStatus, statusText: statusText, weekReport: weekReport,
     findDuplicates: findDuplicates, sortEntries: sortEntries, splitFoodQty: splitFoodQty, listRef: listRef, energySplit: energySplit,
@@ -2067,7 +2223,7 @@ button { cursor: pointer; }
 
   // ------------------------------------------------------------------ état
   var S = {
-    view: 'journal', date: null, today: null, week: null, days: new Map(), wIdx: [],
+    view: 'journal', date: null, today: null, week: null, days: new Map(), wIdx: [], mIdx: [],
     meta: { k: 'meta', schema: 1, createdAt: null, lastBackupAt: null, lastBackupLignes: 0, changes: 0, profile: null, favoris: [], mesAliments: [] },
     storeKind: 'attente', persist: null, usage: null, loss: null, ready: false,
     thread: [], turns: [], busy: false, ecrit: false, abort: null, caps: { done: false, sample: null, sansJson: false, downloads: null },
@@ -2159,6 +2315,7 @@ button { cursor: pointer; }
   var snapTimer = null;
   function afterWrite() {
     S.wIdx = C.weightIndex(S.days);
+    S.mIdx = C.mesuresIndex(S.days);
     var days = Array.from(S.days.values());
     Depot.setSentinel({ lignes: C.countEntries(days), jours: days.filter(C.dayHasData).length, le: new Date().toISOString() });
     clearTimeout(snapTimer);
@@ -2265,6 +2422,20 @@ button { cursor: pointer; }
     });
   }
   function setWeight(date, kg) { return changeDay(date, function (doc) { doc.weight = kg; doc.weightAt = new Date().toISOString(); }); }
+  // Mensurations du jour : une valeur absente laisse la précédente en place (rien n'est effacé).
+  function setMesures(date, m) {
+    return changeDay(date, function (doc) {
+      var t = new Date().toISOString();
+      if (m.waist != null) { doc.waist = m.waist; doc.waistAt = t; }
+      if (m.hip != null) { doc.hip = m.hip; doc.hipAt = t; }
+    });
+  }
+  function lignesMesures(date, m) {
+    var l = [];
+    if (m.waist != null) l.push('Tour de taille enregistré pour ' + C.frDate(date, 'moyen') + ' : ' + C.fmt1(m.waist) + ' cm');
+    if (m.hip != null) l.push('Tour de hanches enregistré pour ' + C.frDate(date, 'moyen') + ' : ' + C.fmt1(m.hip) + ' cm');
+    return l;
+  }
   async function saveProfile(p) {
     S.meta.profile = Object.assign({}, p, { majLe: new Date().toISOString() });
     S.meta.changes = (S.meta.changes || 0) + 1;
@@ -2337,6 +2508,12 @@ button { cursor: pointer; }
       pushCard({ type: 'activite', date: cmd.date, lines: ['Pas enregistrés : ' + C.fmtInt(cmd.steps)] });
       S.date = cmd.date; render(); return;
     }
+    if (cmd && cmd.erreur) { pushCard({ type: 'erreur', text: cmd.erreur }); render(); return; }
+    if (cmd && cmd.mesures) {
+      await setMesures(cmd.date, cmd.mesures);
+      pushCard({ type: 'activite', date: cmd.date, lines: lignesMesures(cmd.date, cmd.mesures) });
+      S.date = cmd.date; render(); return;
+    }
     // Version web : pas d'analyse des phrases. La saisie s'ouvre sur la recherche dans la table, avec les grammes écrits.
     if (WEB) { dialogueManuel(C.splitFoodQty(text)); return; }
     S.busy = true; render();
@@ -2384,6 +2561,10 @@ button { cursor: pointer; }
     if (plan.weight) {
       await setWeight(plan.weight.date, plan.weight.kg);
       lines.push('Poids enregistré pour ' + C.frDate(plan.weight.date, 'moyen') + ' : ' + C.fmt1(plan.weight.kg) + ' kg');
+    }
+    if (plan.mesures) {
+      await setMesures(plan.mesures.date, plan.mesures);
+      lines = lines.concat(lignesMesures(plan.mesures.date, plan.mesures));
     }
     if (made.length) {
       pushCard({ type: 'enregistre', made: made, inferred: fresh.some(function (x) { return x.mealInferred; }), remarks: plan.remarks });
@@ -2459,7 +2640,10 @@ button { cursor: pointer; }
   async function appliquerRestauration(parsed) {
     var plan = C.planMerge(S.days, parsed.days);
     for (var doc of plan.writes) {
-      await changeDay(doc.date, function (cur) { cur.entries = doc.entries; cur.acts = doc.acts; cur.steps = doc.steps; cur.stepsAt = doc.stepsAt; cur.weight = doc.weight; cur.weightAt = doc.weightAt; }, 0);
+      await changeDay(doc.date, function (cur) {
+        cur.entries = doc.entries; cur.acts = doc.acts; cur.steps = doc.steps; cur.stepsAt = doc.stepsAt; cur.weight = doc.weight; cur.weightAt = doc.weightAt;
+        cur.waist = doc.waist == null ? null : doc.waist; cur.waistAt = doc.waistAt || null; cur.hip = doc.hip == null ? null : doc.hip; cur.hipAt = doc.hipAt || null;
+      }, 0);
     }
     var profil = false;
     if (parsed.profile && !C.profileState(S.meta.profile, S.today).ok && !(S.meta.profile && S.meta.profile.majLe)) { S.meta.profile = parsed.profile; profil = true; await saveMeta(); }
@@ -2597,8 +2781,10 @@ button { cursor: pointer; }
     $('dialogues').appendChild(voile);
     document.addEventListener('keydown', onKey);
     // Par défaut, le premier champ reçoit le focus ; focusTitre le donne au titre (pas de clavier ni de défilement).
+    // Si un champ de la boîte a déjà le focus (touché très vite, téléphone lent), on ne le lui reprend pas :
+    // sinon la saisie en cours partirait dans le premier champ.
     var first = o.focusTitre ? titre : box.querySelector('input:not([type=hidden]), select, textarea') || box.querySelector('button');
-    if (first) setTimeout(function () { try { first.focus({ preventScroll: true }); } catch (e) { /* rien */ } }, 30);
+    if (first) setTimeout(function () { try { if (!box.contains(document.activeElement)) first.focus({ preventScroll: true }); } catch (e) { /* rien */ } }, 30);
     return { close: close, box: box };
   }
   function champ(label, control, aide) {
@@ -2839,6 +3025,30 @@ button { cursor: pointer; }
           var kg = C.toNum(v.value);
           if (!C.numOk(kg, 30, 300)) { erreurChamp(corps, 'Indiquez un poids entre 30 et 300 kg.'); return false; }
           await setWeight(date, C.r1(kg)); toast('Pesée enregistrée.'); render();
+        }
+      }]
+    });
+  }
+  // Mensurations : tour de taille et tour de hanches (facultatif). Un champ vide laisse la valeur déjà enregistrée.
+  function dialogueMesures(date) {
+    var doc = S.days.get(date), der = C.mesureAt(S.mIdx, date);
+    var num = function (id, v, lim) { return h('input', { id: id, type: 'number', inputmode: 'decimal', min: String(lim[0]), max: String(lim[1]), step: '0.1', value: v == null ? '' : String(v) }); };
+    var tw = num('m-taille', doc && doc.waist != null ? doc.waist : null, C.MESURE_LIM.taille), th = num('m-hanches', doc && doc.hip != null ? doc.hip : null, C.MESURE_LIM.hanches);
+    var corps = h('div', null,
+      champ('Tour de taille du ' + C.frDate(date, 'moyen') + ' (cm)', tw, "Mètre ruban à mi-chemin entre le bas des côtes et le haut de l'os de la hanche, le matin à jeun, après avoir expiré normalement."),
+      champ('Tour de hanches (cm), facultatif', th, "À l'endroit le plus large des fesses. Il sert au rapport tour de taille / tour de hanches."),
+      der && der.date !== date ? h('p', { class: 'note', text: phrase('Dernière mesure : ' + C.fmt1(der.waist) + ' cm le ' + C.frDate(der.date, 'moyen') + (der.hip != null ? ', hanches ' + C.fmt1(der.hip) + ' cm' : '')) }) : null,
+      doc && (doc.waist != null || doc.hip != null) ? h('p', { class: 'note', text: 'Un champ laissé vide ne change pas la valeur déjà enregistrée pour ce jour.' }) : null);
+    dialogue({
+      titre: 'Mesures', corps: corps,
+      actions: [{ label: 'Fermer' }, {
+        label: 'Enregistrer', kind: 'principal', onClick: async function () {
+          var w = tw.value.trim() === '' ? null : C.toNum(tw.value), hp = th.value.trim() === '' ? null : C.toNum(th.value);
+          if (w == null && hp == null) { erreurChamp(corps, 'Indiquez au moins un tour de taille ou un tour de hanches.'); return false; }
+          if (w != null && !C.mesureOk(w, 'taille')) { erreurChamp(corps, 'Indiquez un tour de taille entre ' + C.MESURE_LIM.taille[0] + ' et ' + C.MESURE_LIM.taille[1] + ' cm.'); return false; }
+          if (hp != null && !C.mesureOk(hp, 'hanches')) { erreurChamp(corps, 'Indiquez un tour de hanches entre ' + C.MESURE_LIM.hanches[0] + ' et ' + C.MESURE_LIM.hanches[1] + ' cm.'); return false; }
+          await setMesures(date, { waist: w == null ? null : C.r1(w), hip: hp == null ? null : C.r1(hp) });
+          toast('Mesures enregistrées.'); render();
         }
       }]
     });
@@ -3206,12 +3416,20 @@ button { cursor: pointer; }
     if (lignes && ((joursDepuis == null && (S.meta.changes || 0) >= 15) || (joursDepuis != null && joursDepuis >= 7 && (S.meta.changes || 0) > 0)))
       out.push(avis('alerte', joursDepuis == null ? 'Aucune sauvegarde en fichier pour le moment : ' + lignes + ' ligne(s) ne reposent que sur la mémoire de l\'application.' : 'Dernière sauvegarde en fichier il y a ' + joursDepuis + ' jours.',
         [{ label: 'Sauvegarder maintenant', onClick: function () { exporter('json'); } }]));
-    if (C.weekdayIndex(S.today) === 6 && S.date === S.today && lignes) out.push(avis('info', 'C\'est dimanche : le rapport de la semaine est prêt.', [{ label: 'Voir le rapport', onClick: function () { S.week = C.weekStart(S.today); go('semaine'); } }]));
+    if (C.weekdayIndex(S.today) === 6 && S.date === S.today && lignes) {
+      var mesuree = S.mIdx.some(function (x) { return x.waist != null && x.date <= S.today && C.diffDays(S.today, x.date) < 7; });
+      out.push(avis('info', 'C\'est dimanche : le rapport de la semaine est prêt.' + (mesuree ? '' : ' C\'est aussi un bon moment pour mesurer votre tour de taille.'),
+        [{ label: 'Voir le rapport', onClick: function () { S.week = C.weekStart(S.today); go('semaine'); } }].concat(mesuree ? [] : [{ label: 'Mesurer', onClick: function () { dialogueMesures(S.today); } }])));
+    }
     // Activité
     var act = [];
+    // Valeur sans détail : elle prend aussi la colonne du détail, pour ne pas couper « non mesuré » sur deux lignes.
+    function valDet(val, det, id) {
+      return det ? [h('span', { class: 'act-val', id: id, text: val }), h('span', { class: 'act-det', text: det })]
+        : [h('span', { class: 'act-val act-val-large', id: id, text: val })];
+    }
     act.push(h('div', { class: 'act-ligne' }, h('span', { class: 'act-nom', text: 'Pas' }),
-      h('span', { class: 'act-val', id: 'pas-jour', text: en.steps == null ? 'non saisis' : C.fmtInt(en.steps) }),
-      h('span', { class: 'act-det', text: en.km != null ? C.fmt1(en.km) + ' km' : '' }),
+      valDet(en.steps == null ? 'non saisis' : C.fmtInt(en.steps), en.km != null ? C.fmt1(en.km) + ' km' : '', 'pas-jour'),
       h('span', { class: 'act-kcal', text: en.ok && en.steps != null ? C.fmtInt(en.marche) : '' }),
       h('button', { type: 'button', class: 'lien', onclick: function () { dialoguePas(S.date); } }, en.steps == null ? 'Saisir' : 'Modifier')));
     en.actList.forEach(function (x) {
@@ -3224,9 +3442,13 @@ button { cursor: pointer; }
         h('button', { type: 'button', class: 'lien', onclick: async function () { await setActStatus(S.date, a.id, 'annulee'); render(); } }, 'Retirer')));
     });
     act.push(h('div', { class: 'act-ligne' }, h('span', { class: 'act-nom', text: 'Poids' }),
-      h('span', { class: 'act-val', text: doc && doc.weight != null ? C.fmt1(doc.weight) + ' kg' : info.kg != null ? C.fmt1(info.kg) + ' kg' : 'non saisi' }),
-      h('span', { class: 'act-det', text: doc && doc.weight != null ? 'du jour' : info.kg != null ? 'dernier connu' : '' }), h('span', { class: 'act-kcal' }),
+      valDet(doc && doc.weight != null ? C.fmt1(doc.weight) + ' kg' : info.kg != null ? C.fmt1(info.kg) + ' kg' : 'non saisi',
+        doc && doc.weight != null ? 'du jour' : info.kg != null ? 'dernier connu' : ''), h('span', { class: 'act-kcal' }),
       h('button', { type: 'button', class: 'lien', onclick: function () { dialoguePoids(S.date); } }, 'Peser')));
+    var mj = C.mesureAt(S.mIdx, S.date);
+    act.push(h('div', { class: 'act-ligne' }, h('span', { class: 'act-nom', text: 'Tour de taille' }),
+      valDet(mj ? C.fmt1(mj.waist) + ' cm' : 'non mesuré', mj ? (mj.date === S.date ? 'du jour' : 'dernier connu') : '', 'taille-jour'), h('span', { class: 'act-kcal' }),
+      h('button', { type: 'button', class: 'lien', id: 'btn-mesurer', onclick: function () { dialogueMesures(S.date); } }, 'Mesurer')));
     out.push(section('Activité', [h('div', { class: 'act' }, act),
       h('div', { class: 'bloc-actions' }, h('button', { type: 'button', class: 'btn btn-petit', onclick: function () { dialogueActivite(S.date); } }, 'Ajouter une activité')),
       en.ok ? h('p', { class: 'note', text: 'Dépense estimée : repos ' + C.fmtInt(en.bmr) + ', digestion ' + C.fmtInt(en.tef) + ', marche ' + C.fmtInt(en.marche) + ', autres activités ' + C.fmtInt(en.acts) + ' kcal.' })
@@ -3265,10 +3487,65 @@ button { cursor: pointer; }
     if (partiel) obs.push('Journée partielle : ces proportions peuvent encore changer.');
     return obs;
   }
+  // ------------------------------------------------------------ corpulence
+  function indic(nom, val, sous, id) {
+    return h('div', { class: 'indic', id: id || null }, h('span', { class: 'indic-nom' }, nom, h('span', { class: 'l-sous', text: sous })), h('span', { class: 'indic-val', text: val }));
+  }
+  function bornesImc(v) {
+    var b = C.CORPULENCE.imc, bas = 0;
+    for (var i = 0; i < b.length; i++) { if (v < b[i][0]) return isFinite(b[i][0]) ? (bas ? C.fmt1(bas) + ' à ' + C.fmt1(b[i][0] - 0.1) : 'moins de ' + C.fmt1(b[i][0])) : C.fmt1(bas) + ' et plus'; bas = b[i][0]; }
+    return '';
+  }
+  function texteLecture(ind) {
+    var L = 'la commission du Lancet (2025)', el = ind.criteres.filter(function (c) { return c.eleve; }).map(function (c) { return c.nom; });
+    if (ind.imc != null && ind.imc > C.CORPULENCE.lancet.imcTresHaut) return 'IMC supérieur à 40 : selon ' + L + ", l'excès de masse grasse peut alors être admis sans autre mesure.";
+    if (ind.taille == null) return ind.imc != null && ind.imc >= C.CORPULENCE.lancet.imc
+      ? 'IMC de 30 ou plus. Selon ' + L + ", l'IMC seul ne suffit pas à conclure : il faut au moins une mesure du tour de taille."
+      : 'Pour cette lecture, il faut au moins une mesure du tour de taille.';
+    switch (ind.lecture) {
+      case 'deux': return 'Indicateurs au-dessus du seuil retenu par ' + L + ' : ' + el.join(', ') + '. Avec au moins deux indicateurs, ses critères indiquent un excès de masse grasse, quel que soit l\'IMC.';
+      case 'imc-un': return 'IMC de 30 ou plus et un indicateur au-dessus du seuil (' + el[0] + ') : selon les critères de ' + L + ', ces mesures indiquent un excès de masse grasse.';
+      case 'imc-non': return 'IMC de 30 ou plus, mais aucun indicateur au-dessus du seuil : selon les critères de ' + L + ', ces mesures ne confirment pas un excès de masse grasse.';
+      case 'sans-imc': return "Sans poids connu, l'IMC manque ; avec moins de deux indicateurs au-dessus du seuil, les critères de " + L + ' ne sont pas réunis.';
+      default: return "Les critères d'excès de masse grasse de " + L + ' ne sont pas réunis : ' + (el.length ? 'un seul indicateur au-dessus du seuil (' + el[0] + '), avec un IMC inférieur à 30.' : 'aucun indicateur au-dessus du seuil' + (ind.imc != null ? ', IMC inférieur à 30.' : '.'));
+    }
+  }
+  // Indicateurs au jour affiché : IMC avec la tendance du poids, et la dernière mesure du tour de taille.
+  function sectionCorpulence(date) {
+    var p = S.meta.profile, pds = C.poidsImc(C.weightTrend(S.wIdx), p, date), mes = C.mesureAt(S.mIdx, date);
+    var ind = C.indicateurs(p, date, pds ? pds.kg : null, mes ? mes.waist : null, mes ? mes.hip : null);
+    if (!ind.ok) return section('Corpulence', h('p', { class: 'note' }, ind.reason === 'mineur' ? "Ces repères sont établis pour l'adulte : ils ne sont pas calculés avant 18 ans." : 'Renseignez votre profil (sexe, année de naissance, taille) pour calculer ces indicateurs. ',
+      ind.reason === 'mineur' ? null : h('button', { type: 'button', class: 'lien', onclick: function () { go('donnees'); } }, 'Ouvrir mon profil')));
+    var sexe = p.sexe, pour = sexe === 'h' ? 'un homme' : 'une femme', st = C.CORPULENCE.taille[sexe], rows = [];
+    rows.push(ind.imc != null
+      ? indic('IMC', C.fmt1(ind.imc), ind.classeImc + ' (' + bornesImc(ind.imc) + ', OMS). ' + (pds.source === 'tendance' ? phrase('Poids : tendance de ' + C.fmt2(pds.kg) + ' kg au ' + C.frDate(pds.date, 'moyen')) : 'Poids du profil : ' + C.fmt1(pds.kg) + ' kg.'), 'corp-imc')
+      : indic('IMC', '–', 'Aucun poids connu : ajoutez une pesée.', 'corp-imc'));
+    if (mes) {
+      rows.push(indic('Tour de taille', C.fmt1(ind.taille) + ' cm', C.NIVEAU_TAILLE[ind.niveauTaille] + ' (OMS : ' + st[0] + ' et ' + st[1] + ' cm pour ' + pour + '). ' + phrase('Mesuré le ' + C.frDate(mes.date, 'moyen')), 'corp-taille'));
+      rows.push(indic('Tour de taille / taille', C.fmt2(ind.rtt), C.NIVEAU_RTT[ind.niveauRtt] + ' (NICE : 0,5 et 0,6).', 'corp-rtt'));
+      rows.push(ind.rth != null
+        ? indic('Tour de taille / hanches', C.fmt2(ind.rth), (ind.rthEleve ? 'Au-dessus' : 'En dessous') + " du seuil de l'OMS (" + C.fmt2(C.CORPULENCE.rth[sexe]) + ' pour ' + pour + ').', 'corp-rth')
+        : indic('Tour de taille / hanches', '–', 'Tour de hanches non mesuré le même jour que le tour de taille.', 'corp-rth'));
+      rows.push(indic('Masse grasse estimée', C.fmt1(ind.rfm) + ' %', 'Estimation à partir de la taille et du tour de taille (formule RFM), à lire comme un ordre de grandeur.', 'corp-rfm'));
+    } else rows.push(indic('Tour de taille', '–', 'Pas encore mesuré : les autres indicateurs en dépendent.', 'corp-taille'));
+    var kids = [h('div', { class: 'indics' }, rows)];
+    if (!mes) kids.push(h('div', { class: 'bloc-actions' }, h('button', { type: 'button', class: 'btn btn-petit', onclick: function () { dialogueMesures(date); } }, 'Mesurer le tour de taille')));
+    kids.push(h('h3', { class: 'sous-titre', text: "Lecture d'ensemble" }), h('p', { id: 'corp-lecture', text: texteLecture(ind) }),
+      h('p', { class: 'note', text: "Ces repères ne disent pas si la masse grasse a un effet sur la santé : la commission distingue l'obésité « clinique » et « préclinique » selon l'état des organes, ce qui relève d'un médecin." }),
+      h('details', { class: 'historique-ligne' }, h('summary', { text: 'Seuils, sources et limites' }), h('ul', { class: 'puces', id: 'corp-sources' },
+        h('li', { text: "IMC : poids divisé par le carré de la taille. Classes de l'OMS : moins de 18,5 ; 18,5 à 24,9 ; surpoids de 25 à 29,9 ; obésité à partir de 30 (classes I, II et III à partir de 30, 35 et 40). L'IMC ne distingue pas la graisse du muscle." }),
+        h('li', { text: "Tour de taille : risque accru à partir de 94 cm chez l'homme et 80 cm chez la femme, nettement accru à partir de 102 et 88 cm (OMS). La Fédération internationale du diabète retient les mêmes premiers seuils pour la Méditerranée et le Moyen-Orient." }),
+        h('li', { text: 'Tour de taille / taille : de 0,4 à 0,49, pas de risque accru ; de 0,5 à 0,59, risque accru ; 0,6 ou plus, risque encore plus élevé (NICE).' }),
+        h('li', { text: "Tour de taille / tour de hanches : risque métabolique accru à partir de 0,90 chez l'homme et 0,85 chez la femme (OMS)." }),
+        h('li', { text: 'Masse grasse estimée : 64 − 20 × taille / tour de taille, plus 12 pour une femme (Woolcott et Bergman, 2018). Formule établie sur des adultes américains.' }),
+        h('li', { text: "Lecture d'ensemble : commission du Lancet (2025). Excès de masse grasse si l'IMC dépasse 40, si deux indicateurs dépassent leur seuil, ou si l'IMC atteint 30 avec un indicateur au-dessus du seuil. Seuils de la commission pour l'adulte d'origine européenne : tour de taille de 102 cm (homme) ou 88 cm (femme), rapport tour de taille / taille de 0,5, rapport tour de taille / hanches de 0,90 (homme) ou 0,85 (femme)." }),
+        h('li', { text: "Repères pour l'adulte, hors grossesse. Ce ne sont pas des diagnostics." }))));
+    return section('Corpulence', kids, null, 'au ' + C.frDate(date, 'moyen'));
+  }
   function vueBilan() {
     var info = dayInfo(S.date), tot = info.tot, en = info.en, st = info.st, out = [];
     if (!tot.n && en.steps == null && !en.nActs) {
-      return [section('Bilan du jour', h('p', { class: 'vide', text: 'Rien de saisi pour le ' + C.frDate(S.date, 'long') + '. Le bilan apparaîtra dès le premier repas enregistré.' }))];
+      return [section('Bilan du jour', h('p', { class: 'vide', text: 'Rien de saisi pour le ' + C.frDate(S.date, 'long') + '. Le bilan apparaîtra dès le premier repas enregistré.' })), sectionCorpulence(S.date)];
     }
     out.push(section('Apports du ' + C.frDate(S.date, 'moyen'), [
       h('p', { class: 'grand', id: 'bilan-total' }, h('span', { class: 'grand-val', text: C.fmtInt(tot.kcal) }), ' kcal sur ' + tot.n + ' aliment' + (tot.n > 1 ? 's' : '') + ' et ' + tot.mealCount + ' repas'),
@@ -3312,6 +3589,7 @@ button { cursor: pointer; }
       out.push(section('Données à vérifier', verif.length ? h('ul', { class: 'puces' }, verif.map(function (t) { return h('li', { text: t }); })) : h('p', { text: 'Toutes les quantités sont déclarées et toutes les valeurs viennent de la table de référence.' })));
       out.push(section('Observations', h('ul', { class: 'puces' }, observationsMacros(tot, st.missing.length > 0).map(function (t) { return h('li', { text: t }); }))));
     }
+    out.push(sectionCorpulence(S.date));
     return out;
   }
   function echelle(max) {
@@ -3366,6 +3644,13 @@ button { cursor: pointer; }
         h('span', { class: 'cle' }, h('span', { class: 'cle-rect partielle' }), 'Journée partielle'),
         exps.some(Boolean) ? h('span', { class: 'cle' }, h('span', { class: 'cle-trait' }), 'Dépense estimée') : null));
   }
+  function texteTailleSemaine(rep) {
+    var ms = S.mIdx.filter(function (p) { return p.waist != null && p.date >= rep.start && p.date <= rep.end; });
+    if (!ms.length) return null;
+    var der = ms[ms.length - 1], avant = C.mesureAt(S.mIdx, C.addDays(ms[0].date, -1)), dif = avant ? C.r1(der.waist - avant.waist) : null;
+    return phrase('Tour de taille : ' + C.fmt1(der.waist) + ' cm le ' + C.frDate(der.date, 'moyen')
+      + (avant ? ' (' + (dif > 0 ? '+' : dif < 0 ? '−' : '') + C.fmt1(Math.abs(dif)) + ' cm depuis la mesure du ' + C.frDate(avant.date, 'moyen') + ')' : ''));
+  }
   function vueSemaine() {
     var rep = C.weekReport(S.days, S.week, S.today, S.meta.profile, S.wIdx), out = [], eg = rep.energy;
     if (!rep.withData && !eg.stepsDays) {
@@ -3405,8 +3690,10 @@ button { cursor: pointer; }
       if (eg.weightFirst && eg.weightLast && eg.weightFirst.date !== eg.weightLast.date) en.push('Pesées : ' + C.fmt1(eg.weightFirst.kg) + ' kg le ' + C.frDate(eg.weightFirst.date, 'moyen') + ', ' + C.fmt1(eg.weightLast.kg) + ' kg le ' + C.frDate(eg.weightLast.date, 'moyen') + ' (' + C.fmt2s(eg.weightLast.kg - eg.weightFirst.kg) + ' kg mesurés).');
       else if (eg.weightFirst) en.push(phrase('Pesée : ' + C.fmt1(eg.weightFirst.kg) + ' kg le ' + C.frDate(eg.weightFirst.date, 'moyen')));
       if (eg.trend) en.push(phrase('Tendance du poids (moyenne lissée) : ' + C.fmt2(eg.trend.kg) + ' kg au ' + C.frDate(eg.trend.date, 'moyen') + (eg.trend.prev ? ', soit ' + C.fmt2s(eg.trend.delta) + ' kg depuis la pesée du ' + C.frDate(eg.trend.prev.date, 'moyen') : '')));
+      var tm = texteTailleSemaine(rep);
+      if (tm) en.push(tm);
       out.push(section('Bilan énergétique', h('ul', { class: 'puces' }, en.map(function (t) { return h('li', { text: t }); }))));
-    }
+    } else if (texteTailleSemaine(rep)) out.push(section('Mesures', h('ul', { class: 'puces' }, h('li', { text: texteTailleSemaine(rep) }))));
     if (rep.withData) {
       var hab = [];
       if (rep.habits.foods.length) hab.push('Aliments revenus au moins ' + rep.habits.minDays + ' jours : ' + rep.habits.foods.map(function (f) { return f.nom + ' (' + f.jours + ' j)'; }).join(', ') + '.');
@@ -3485,6 +3772,62 @@ button { cursor: pointer; }
       tableau(['Date', 'Pesée (kg)', 'Tendance (kg)'], pts.slice().reverse().map(function (p) { return { cells: [C.frDate(p.date, 'moyen'), C.fmt1(p.kg), C.fmt2(p.trend)] }; }), 'etroit')));
     return section('Poids', kids, null, from === '0000-00-00' ? 'kg, depuis la première pesée' : 'kg, 30 derniers jours');
   }
+  // Tour de taille : mesures (cercles) reliées par un trait, une seule teinte ; info-bulle par mesure ; tableau jumeau.
+  function graphiqueTaille(pts, start, end) {
+    var W = 340, H = 180, m = { l: 40, r: 40, t: 12, b: 30 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var span = Math.max(1, C.diffDays(end, start));
+    var x = function (d) { return m.l + pw * Math.max(0, C.diffDays(d, start)) / span; };
+    var vals = pts.map(function (p) { return p.waist; });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), pas = [0.5, 1, 2, 5, 10, 20], st = 50;
+    for (var i = 0; i < pas.length; i++) if (Math.ceil(hi / pas[i] - 1e-9) - Math.floor(lo / pas[i] + 1e-9) <= 5) { st = pas[i]; break; }
+    var y0 = Math.floor(lo / st + 1e-9) * st, y1 = Math.ceil(hi / st - 1e-9) * st;
+    if (y1 - y0 < 2 * st - 1e-9) { y0 -= st; y1 += st; }
+    var y = function (v) { return m.t + ph - ph * (v - y0) / (y1 - y0); };
+    var lab = function (v) { return (Math.round(v * 10) / 10).toFixed(st < 1 ? 1 : 0).replace('.', ','); };
+    var root = s('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'graphique', role: 'group', 'aria-label': 'Tour de taille mesuré, en centimètres' });
+    for (var v = y0; v <= y1 + 1e-9; v += st) {
+      root.appendChild(s('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), class: Math.abs(v - y0) < 1e-9 ? 'axe' : 'grille' }));
+      root.appendChild(s('text', { x: m.l - 6, y: y(v) + 3.5, class: 'tic', 'text-anchor': 'end', text: lab(v) }));
+    }
+    var dates = [start, end];
+    if (span >= 10) dates.splice(1, 0, C.addDays(start, Math.round(span / 2)));
+    dates.forEach(function (d, k) { root.appendChild(s('text', { x: x(d), y: H - m.b + 16, class: 'tic', 'text-anchor': k === 0 ? 'start' : k === dates.length - 1 ? 'end' : 'middle', text: C.frDate(d, 'court') })); });
+    if (pts.length > 1) root.appendChild(s('path', { class: 'tendance', d: pts.map(function (p, k) { return (k ? 'L' : 'M') + x(p.date).toFixed(1) + ',' + y(p.waist).toFixed(1); }).join('') }));
+    var der = pts[pts.length - 1];
+    root.appendChild(s('text', { x: x(der.date) + 7, y: y(der.waist) + 3.5, class: 'etiquette', text: C.fmt1(der.waist) }));
+    pts.forEach(function (p) { root.appendChild(s('circle', { cx: x(p.date), cy: y(p.waist), r: 4, class: 'pesee' })); });
+    pts.forEach(function (p, k) {
+      var a = k ? (x(pts[k - 1].date) + x(p.date)) / 2 : m.l, b = k < pts.length - 1 ? (x(p.date) + x(pts[k + 1].date)) / 2 : W - m.r;
+      var lines = [cap(C.frDate(p.date, 'long')), [C.fmt1(p.waist) + ' cm', 'tour de taille']];
+      if (p.hip != null) lines.push([C.fmt1(p.hip) + ' cm', 'tour de hanches']);
+      var hit = s('rect', { x: a, y: m.t, width: Math.max(6, b - a), height: ph, class: 'zone', tabindex: '0', role: 'img', 'aria-label': lines.map(function (l) { return Array.isArray(l) ? l[1] + ' ' + l[0] : l; }).join(', ') });
+      survol(hit, lines);
+      root.appendChild(hit);
+    });
+    return h('figure', { class: 'figure' }, root,
+      h('figcaption', { class: 'legende' }, h('span', { class: 'cle' }, h('span', { class: 'cle-rond' }), 'Tour de taille mesuré')));
+  }
+  function sectionMesures(from) {
+    var tout = S.mIdx.filter(function (p) { return p.waist != null; }), kids = [];
+    var pts = tout.filter(function (p) { return p.date >= from && p.date <= S.today; }), start = from === '0000-00-00' ? tout[0].date : from;
+    if (pts.length > 1) kids.push(graphiqueTaille(pts, start, S.today));
+    var der = tout[tout.length - 1], txt = ['Dernière mesure, le ' + C.frDate(der.date, 'moyen') + ' : ' + C.fmt1(der.waist) + ' cm' + (der.hip != null ? ', tour de hanches ' + C.fmt1(der.hip) + ' cm' : '') + '.'];
+    if (!pts.length) txt.push('Aucune mesure sur cette période : choisissez une période plus longue.');
+    else if (pts.length === 1) txt.push('La courbe apparaît à partir de deux mesures sur la période.');
+    else {
+      var a = pts[0], b = pts[pts.length - 1], serie = C.weightTrend(S.wIdx), ta = C.trendAt(serie, a.date), tb = C.trendAt(serie, b.date);
+      txt.push('Du ' + C.frDate(a.date, 'moyen') + ' au ' + C.frDate(b.date, 'moyen') + ' : ' + C.fmt1(a.waist) + ' puis ' + C.fmt1(b.waist) + ' cm (' + (b.waist - a.waist > 0 ? '+' : b.waist - a.waist < 0 ? '−' : '') + C.fmt1(Math.abs(C.r1(b.waist - a.waist))) + ' cm).'
+        + (ta && tb && ta !== tb ? ' Tendance du poids entre ces deux dates : ' + C.fmt2s(tb.trend - ta.trend) + ' kg.' : ''));
+    }
+    kids.push(h('ul', { class: 'puces', id: 'taille-texte' }, txt.map(function (t) { return h('li', { text: t }); })));
+    kids.push(h('p', { class: 'note', text: "Un écart d'un centimètre d'une mesure à l'autre peut venir de la mesure elle-même : mêmes conditions et même repère à chaque fois." }));
+    if (pts.length) kids.push(h('details', { class: 'historique-ligne' }, h('summary', { text: 'Mesures en tableau' }),
+      tableau(['Date', 'Taille (cm)', 'Hanches (cm)', 'Taille / taille', 'Taille / hanches'], pts.slice().reverse().map(function (p) {
+        var ind = C.indicateurs(S.meta.profile, p.date, null, p.waist, p.hip);
+        return { cells: [C.frDate(p.date, 'moyen'), C.fmt1(p.waist), p.hip != null ? C.fmt1(p.hip) : '–', ind.rtt != null ? C.fmt2(ind.rtt) : '–', ind.rth != null ? C.fmt2(ind.rth) : '–'] };
+      }), 'etroit')));
+    return section('Tour de taille', kids, null, from === '0000-00-00' ? 'cm, depuis la première mesure' : 'cm, 30 derniers jours');
+  }
   function vueHistorique() {
     var out = [], all = Array.from(S.days.values()).filter(C.dayHasData).sort(function (a, b) { return a.date < b.date ? 1 : -1; });
     var from = S.histRange === 'semaine' ? C.weekStart(S.today) : S.histRange === 'mois' ? C.addDays(S.today, -29) : '0000-00-00';
@@ -3494,6 +3837,7 @@ button { cursor: pointer; }
     })));
     // Le poids se lit sur plusieurs semaines : 30 jours au moins, ou tout l'historique.
     if (S.wIdx.length) out.push(sectionPoids(S.histRange === 'tout' ? '0000-00-00' : C.addDays(S.today, -29)));
+    if (S.mIdx.some(function (p) { return p.waist != null; })) out.push(sectionMesures(S.histRange === 'tout' ? '0000-00-00' : C.addDays(S.today, -29)));
     if (!list.length) { out.push(section(null, h('p', { class: 'vide', text: all.length ? 'Aucune saisie sur cette période.' : 'Le journal est vide. Les journées saisies apparaîtront ici.' }))); return out; }
     list.forEach(function (d) {
       var info = dayInfo(d.date), detail = S.histRange === 'semaine';
@@ -3502,7 +3846,7 @@ button { cursor: pointer; }
           h('span', { class: 'jour-nom', text: cap(C.frDate(d.date, 'long')) }),
           h('span', { class: 'jour-kcal', text: info.tot.n ? kcal(info.tot.kcal) : 'aucun repas' })),
         h('p', { class: 'note', text: [info.tot.n ? info.tot.n + ' aliment' + (info.tot.n > 1 ? 's' : '') + ', ' + info.tot.mealCount + ' repas' : null, info.en.steps != null ? C.fmtInt(info.en.steps) + ' pas' : null,
-          info.en.ok && info.tot.n ? 'bilan ' + C.fmtSigned(info.en.balance) + ' kcal' : null, C.statusText(info.st, info.tot.n)].filter(Boolean).join(' ; ') + '.' }),
+          info.en.ok && info.tot.n ? 'bilan ' + C.fmtSigned(info.en.balance) + ' kcal' : null, d.waist != null ? 'tour de taille ' + C.fmt1(d.waist) + ' cm' : null, C.statusText(info.st, info.tot.n)].filter(Boolean).join(' ; ') + '.' }),
         detail ? h('div', { class: 'registre' }, blocRepas(d.date, d, info.tot, true)) : null));
     });
     out.push(h('p', { class: 'note centre', text: list.length + ' journée' + (list.length > 1 ? 's' : '') + ' affichée' + (list.length > 1 ? 's' : '') + '. Touchez une journée pour l\'ouvrir.' }));
@@ -3584,6 +3928,7 @@ button { cursor: pointer; }
       h('li', { text: 'Repas repris ou favoris : les quantités et leur marquage sont recopiés ; les valeurs pour 100 g sont celles de la table ou de Mes aliments au moment de la reprise. Une quantité modifiée à la reprise est enregistrée comme déclarée.' }),
       h('li', { text: "Lignes déjà enregistrées : elles gardent leurs valeurs. Pour les mettre aux valeurs actuelles d'un aliment, touchez « Aligner » dans sa fiche ; l'ancienne valeur reste dans les modifications de la ligne." }),
       h('li', { text: "Table des aliments : consultable dans l'onglet Aliments, avec la source et la fiabilité de chaque valeur." }),
+      h('li', { text: "Corpulence (Bilan) : IMC calculé avec la tendance du poids ; tour de taille, rapports et masse grasse estimée calculés avec la dernière mesure. Repères de l'OMS, de NICE et de la commission du Lancet, détaillés sous le Bilan. Repères pour l'adulte, hors grossesse : ce ne sont pas des diagnostics." }),
       h('li', { text: "Tout est estimé. L'application ne fixe aucun objectif et ne remplace pas l'avis d'un professionnel de santé." }))));
     return out;
   }
@@ -3899,6 +4244,7 @@ button { cursor: pointer; }
       S.storeKind = 'memoire';
     }
     S.wIdx = C.weightIndex(S.days);
+    S.mIdx = C.mesuresIndex(S.days);
     // Aliments déjà saisis hors table (y compris avant cette version) : rangés dans Mes aliments.
     try { await amorcerMesAliments(); } catch (e) { /* le journal reste utilisable ; nouvel essai au prochain démarrage */ }
     var lignes = C.countEntries(Array.from(S.days.values())), temoin = Depot.sentinel();
