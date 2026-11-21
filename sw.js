@@ -2,7 +2,7 @@
 // Page : réseau d'abord (une nouvelle version publiée est prise au lancement suivant), copie locale si le réseau
 // manque ou tarde. Icônes et manifeste : copie locale d'abord. Police (Google Fonts) : gardée après le premier
 // chargement. Les données du journal ne passent jamais par ici : elles restent dans la base du navigateur.
-var VERSION = '2026-11-21-fec04276';
+var VERSION = '2026-11-21-a70c955d';
 var CACHE = 'suivi-nutritionnel-' + VERSION;
 var POLICE = 'suivi-nutritionnel-police';
 var FICHIERS = ["./", "./index.html", "./manifest.webmanifest", "./icons/apple-touch-icon.png", "./icons/favicon-48.png", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png"];
